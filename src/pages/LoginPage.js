@@ -8,12 +8,9 @@ import { Container, Typography, Slide } from '@mui/material';
 import { reset } from '../utils/checkAuth';
 // hooks
 import useResponsive from '../hooks/useResponsive';
-// components
 
 // sections
 import { LoginForm } from '../sections/auth/login';
-
-// ----------------------------------------------------------------------
 
 const StyledRoot = styled('div')(({ theme }) => ({
   [theme.breakpoints.up('md')]: {

@@ -12,6 +12,9 @@ export default function DashboardAppPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!user) {
+      navigate('/super-admin/login', { replace: true });
+    }
     if (!CheckAuthorization() && user === 'super-admin') {
       navigate('/super-admin/login', { replace: true });
     } else if (!CheckAuthorization() && user === 'merchant') {

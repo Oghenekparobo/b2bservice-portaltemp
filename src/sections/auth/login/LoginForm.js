@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
+
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 // @mui
 import { Stack, IconButton, InputAdornment, TextField, Collapse } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 
-// components
 import Iconify from '../../../components/iconify';
 
 // ----------------------------------------------------------------------
@@ -37,14 +38,26 @@ export default function LoginForm({ adminType }) {
     if (adminType === 'super-admin') {
       console.log('this is the super admin access');
 
-      if (inputUsername !== 'vasadmin' || inputPassword !== '2919') {
-        setMessage('username or password is incorrect');
-        return;
-      }
+      // if (inputUsername !== 'vasadmin' || inputPassword !== '2919') {
+      //   setMessage('username or password is incorrect');
+      //   return;
+      // }
       const formData = new FormData();
       formData.append('username', username);
       formData.append('password', password);
-      // perform authentication on seyis, get token
+
+      const response = await axios.post(
+        'http://141.144.237.21:3000/login',
+        {
+          username,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      console.log(response.status);
       // const response = await fetch('http://132.145.231.191/b2bapp-stephen/login', {
       //   method: 'POST',
       //   body: formData,

@@ -1,15 +1,21 @@
+import React from 'react';
 import ReactDOM from 'react-dom/client';
-
-//
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import reportWebVitals from './reportWebVitals';
 
-// ----------------------------------------------------------------------
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-root.render(<App />);
+const queryClient = new QueryClient();
+
+root.render(
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
+  </React.StrictMode>
+);
 
 // If you want to enable client cache, register instead.
 serviceWorker.unregister();
