@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { Stack, IconButton, InputAdornment, TextField, Collapse } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { getCredentials } from '../../../utils/checkAuth';
@@ -10,26 +13,10 @@ export default function Form() {
   const [companyName, setCompanyName] = useState('');
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState('');
-  const [createdSubmerchants, setCreatedSubmerchants] = useState([]);
 
-  const { user } = getCredentials();
+  const { user, token } = getCredentials();
 
-  const isUsernameUnique = (username) => !createdSubmerchants.includes(username);
-
-  const createSubmerchant = () => {
-    if (!isUsernameUnique(username)) {
-      setMessage('Username is already taken');
-    } else {
-      setCreatedSubmerchants([...createdSubmerchants, username]);
-      setMessage('merchant onboarded successfully');
-      // Perform additional logic for submerchant onboarding
-    }
-
-    // Reset form fields
-    setUsername('');
-    setPassword('');
-    setCompanyName('');
-  };
+  console.log(token);
 
   const handleClick = async (e) => {
     e.preventDefault();
@@ -39,18 +26,43 @@ export default function Form() {
     }
 
     if (user === 'super-admin') {
-      if (!isUsernameUnique(username)) {
-        setMessage('Username is already taken');
-        return;
+      try {
+        const body = {
+          name: companyName,
+          username,
+          password,
+        };
+
+        const { data } = await axios.post('http://141.144.237.21:3000/create-merchant', body, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        toast.success('Merchant Created Successfully', {
+          position: 'top-center',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        });
+        console.log(data);
+      } catch (error) {
+        console.log(error.message);
+        toast.error('Username Has Already Been Created', {
+          position: 'top-center',
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        });
       }
-      createSubmerchant();
-      // Perform additional logic for super-admin
     } else if (user === 'merchant') {
-      if (createdSubmerchants.length >= 2) {
-        setMessage('You have reached the maximum number of submerchants');
-        return;
-      }
-      createSubmerchant();
       // Perform additional logic for merchant
     }
   };
@@ -103,7 +115,7 @@ export default function Form() {
         </LoadingButton>
       )}
 
-      {user === 'merchant' && createdSubmerchants.length < 2 && (
+      {/* {user === 'merchant' && createdSubmerchants.length < 2 && (
         <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}>
           Onboard
         </LoadingButton>
@@ -111,7 +123,7 @@ export default function Form() {
 
       {user === 'merchant' && createdSubmerchants.length >= 2 && (
         <div>You have reached the maximum number of submerchants</div>
-      )}
+      )} */}
     </>
   );
 }

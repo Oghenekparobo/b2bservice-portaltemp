@@ -1,18 +1,23 @@
+import { experimentalStyled } from '@mui/material';
+
 // Function to check if the user should be redirected to the login page
 export const CheckAuthorization = () => {
   // Check if either username or currentName is missing
 
-  const { username, user } = getCredentials();
+  const { username, user, token } = getCredentials();
+
   if (!username || !user) {
     reset();
-    console.log('1');
     return false;
   }
 
-  // Check if currentName is not 'super-admin' or 'vas2nets'
-  if (user !== 'super-admin' && user !== 'merchant') {
+  // Check if currentName is not 'super-admin' or 'merchant'
+  if (user !== 'super-admin' && user !== 'merchant' && !token) {
     reset();
-    console.log('2');
+    return false;
+  }
+  if (!token || token === null || token === '') {
+    reset();
     return false;
   }
 
@@ -30,7 +35,20 @@ export const reset = () => {
 export const getCredentials = () => {
   const username = localStorage.getItem('username');
   const user = localStorage.getItem('user');
+  const token = localStorage.getItem('token');
 
-  return { username, user };
-  // const username = localStorage.getItem('username')
+  return { username, user, token };
+};
+
+// check if token has expired
+
+// export function checkTokenExpiry() {
+//   const { token } = getCredentials();
+//   console.log(token);
+//   return { token };
+// }
+
+export const getToken = () => {
+  const token = localStorage.getItem('token');
+  return { token };
 };

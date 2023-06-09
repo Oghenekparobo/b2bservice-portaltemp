@@ -1,5 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import { Grid, Container, Typography, Card, Button } from '@mui/material';
 import { useEffect } from 'react';
 import { AppWidgetSummary, MerchantTable, TransactionsTable } from '../sections/@dashboard/app';
@@ -10,6 +12,23 @@ import { CheckAuthorization, getCredentials } from '../utils/checkAuth';
 export default function DashboardAppPage() {
   const { user, username } = getCredentials();
   const navigate = useNavigate();
+
+  const { data } = useQuery({
+    queryKey: ['airtime-balance'],
+    queryFn: async () => {
+      const response = await fetch('http://141.144.237.21:3000/fetch-dataBalance', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: 'parallex' }),
+      });
+      const data = await response.json();
+      return data;
+    },
+  });
+
+  console.log('Airtime balance data:', data, typeof username, username);
 
   useEffect(() => {
     if (!user) {

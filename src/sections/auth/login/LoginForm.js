@@ -37,64 +37,48 @@ export default function LoginForm({ adminType }) {
 
     if (adminType === 'super-admin') {
       console.log('this is the super admin access');
-
-      // if (inputUsername !== 'vasadmin' || inputPassword !== '2919') {
-      //   setMessage('username or password is incorrect');
-      //   return;
-      // }
       const formData = new FormData();
       formData.append('username', username);
       formData.append('password', password);
 
-      const response = await axios.post(
-        'http://141.144.237.21:3000/login',
-        {
+      try {
+        const body = {
           username,
           password,
-        },
-        {
-          withCredentials: true,
+        };
+        const { data } = await axios.post('http://141.144.237.21:3000/login', body);
+
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', adminType);
+        localStorage.setItem('username', username);
+
+        if (data.token) {
+          navigate('/dashboard', { replace: true });
         }
-      );
-
-      console.log(response.status);
-      // const response = await fetch('http://132.145.231.191/b2bapp-stephen/login', {
-      //   method: 'POST',
-      //   body: formData,
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      // });
-      // const data = await response.json();
-      // console.log(data);
-      localStorage.setItem('user', adminType);
-      localStorage.setItem('username', username);
-
-      navigate('/dashboard', { replace: true });
+      } catch (error) {
+        setMessage('username or password is incorrect');
+      }
     } else {
       console.log('this is the merchant access');
-      if (inputUsername !== 'shalina' || inputPassword !== '2913') {
+
+      try {
+        const body = {
+          username,
+          password,
+        };
+        const { data } = await axios.post('http://141.144.237.21:3000/login', body);
+
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', 'merchant');
+        localStorage.setItem('username', username);
+
+        if (data.token) {
+          console.log(data.token);
+          navigate('/dashboard', { replace: true });
+        }
+      } catch (error) {
         setMessage('username or password is incorrect');
-        return;
       }
-
-      const formData = new FormData();
-      formData.append('username', username);
-      formData.append('password', password);
-      // perform authentication on seyis, get token
-      // const response = await fetch('http://132.145.231.191/b2bapp-stephen/login', {
-      //   method: 'POST',
-      //   body: formData,
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      // });
-      // const data = await response.json();
-      // console.log(data);
-      localStorage.setItem('user', 'merchant');
-      localStorage.setItem('username', username);
-
-      navigate('/dashboard', { replace: true });
     }
   };
 
