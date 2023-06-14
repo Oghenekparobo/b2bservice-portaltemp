@@ -14,23 +14,6 @@ import ScrollToTop from './components/scroll-to-top';
 // ----------------------------------------------------------------------
 
 export default function App() {
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await axios.post('http://141.144.237.21:3000/login', {
-  //         username: 'vasAdmin',
-  //         password: 'password123',
-  //       });
-
-  //       const data = response;
-  //       console.log(data);
-  //     } catch (error) {
-  //       console.error('Error:', error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
   return (
     <HelmetProvider>
       <BrowserRouter>

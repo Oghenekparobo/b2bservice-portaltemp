@@ -1,45 +1,30 @@
 import { Helmet } from 'react-helmet-async';
-import { Link, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Grid, Container, Typography, Card, Button } from '@mui/material';
 import { useEffect } from 'react';
+import { useBalances } from '../hooks/useBalances';
 import { AppWidgetSummary, MerchantTable, TransactionsTable } from '../sections/@dashboard/app';
 import Iconify from '../components/iconify';
 
-import { CheckAuthorization, getCredentials } from '../utils/checkAuth';
+import { CheckAuthorization } from '../utils/checkAuth';
 
 export default function DashboardAppPage() {
-  const { user, username } = getCredentials();
+  const { user, username, token } = CheckAuthorization();
   const navigate = useNavigate();
 
-  const { data } = useQuery({
-    queryKey: ['airtime-balance'],
-    queryFn: async () => {
-      const response = await fetch('http://141.144.237.21:3000/fetch-dataBalance', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: 'parallex' }),
-      });
-      const data = await response.json();
-      return data;
-    },
-  });
-
-  console.log('Airtime balance data:', data, typeof username, username);
+  const { airtimeBalance, airtimeLoading, b2bBalance, b2bLoading, dataBalance, dataLoading } = useBalances(username);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/super-admin/login', { replace: true });
+    if (!token && user === 'super-admin') {
+      navigate('/super-admin/login');
+    } else if (!token && user === 'merchant') {
+      navigate('/login');
     }
-    if (!CheckAuthorization() && user === 'super-admin') {
-      navigate('/super-admin/login', { replace: true });
-    } else if (!CheckAuthorization() && user === 'merchant') {
-      navigate('/login', { replace: true });
+
+    if (!token) {
+      navigate('/login');
     }
-  }, [navigate, user]);
+  }, [navigate, user, token]);
 
   return (
     <>
@@ -56,14 +41,29 @@ export default function DashboardAppPage() {
           {user === 'merchant' ? (
             <>
               <Grid item xs={12} sm={6} md={3}>
-                <AppWidgetSummary title="Airtime" total={1000000} color="info" icon={'ant-design:apple-filled'} />
+                <AppWidgetSummary
+                  title="Airtime"
+                  total={airtimeLoading ? 'loading...' : airtimeBalance?.balance ? airtimeBalance.balance : 0}
+                  color="info"
+                  icon={'ant-design:apple-filled'}
+                />
               </Grid>
 
               <Grid item xs={12} sm={6} md={3}>
-                <AppWidgetSummary title="Data" total={1723315} color="warning" icon={'ant-design:windows-filled'} />
+                <AppWidgetSummary
+                  title="Data"
+                  total={dataLoading ? 'loading...' : dataBalance?.balance ? dataBalance.balance : 0}
+                  color="warning"
+                  icon={'ant-design:windows-filled'}
+                />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <AppWidgetSummary title="B2B" total={23400000} color="error" icon={'ant-design:bug-filled'} />
+                <AppWidgetSummary
+                  title="B2B"
+                  total={b2bLoading ? 'loading...' : b2bBalance?.balance ? b2bBalance.balance : 0}
+                  color="error"
+                  icon={'ant-design:bug-filled'}
+                />
               </Grid>
             </>
           ) : (

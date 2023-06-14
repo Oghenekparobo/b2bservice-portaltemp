@@ -5,9 +5,6 @@ import { Helmet } from 'react-helmet-async';
 import { Card, Container, Typography, Box } from '@mui/material';
 import { FormPage } from '../sections/@dashboard/form';
 import { CheckAuthorization, getCredentials } from '../utils/checkAuth';
-// components
-
-// --------------------------------------------------------------------
 
 export default function Onboard() {
   const { user } = getCredentials();

@@ -1,28 +1,40 @@
-import { experimentalStyled } from '@mui/material';
-
 // Function to check if the user should be redirected to the login page
 export const CheckAuthorization = () => {
-  // Check if either username or currentName is missing
-
   const { username, user, token } = getCredentials();
 
-  if (!username || !user) {
+  const checkTokenExpiration = () => {
+    const expirationTime = 54 * 60 * 1000;
+    const timestamp = localStorage.getItem('timestamp');
+
+    if (!username || !user || !token || !timestamp) {
+      reset();
+      return;
+    }
+
+    const currentTime = Date.now();
+    const elapsedTime = currentTime - Number(timestamp);
+
+    if (elapsedTime >= expirationTime) {
+      // Token has expired, refresh the token
+      const newToken = 'your_new_token_here';
+      localStorage.setItem('token', newToken);
+      localStorage.setItem('timestamp', currentTime.toString());
+    }
+  };
+
+  checkTokenExpiration();
+
+  if (!username || !user || !token) {
     reset();
     return false;
   }
 
-  // Check if currentName is not 'super-admin' or 'merchant'
-  if (user !== 'super-admin' && user !== 'merchant' && !token) {
-    reset();
-    return false;
-  }
-  if (!token || token === null || token === '') {
+  if (user !== 'super-admin' && user !== 'merchant') {
     reset();
     return false;
   }
 
-  // Return true if the user is authorized
-  return true;
+  return { user, username, token };
 };
 
 // Function to clear credentials

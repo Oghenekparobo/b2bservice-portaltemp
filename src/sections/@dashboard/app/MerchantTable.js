@@ -1,46 +1,61 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import $ from 'jquery';
 import 'datatables.net-dt/js/dataTables.dataTables';
 import 'datatables.net-responsive-dt/css/responsive.dataTables.min.css';
+// import { styled } from '@mui/material/styles';
 import { Grid, Paper, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { v4 as uuidv4 } from 'uuid';
 import { Link } from 'react-router-dom';
+import { getCredentials } from '../../../utils/checkAuth';
 
 const MerchantTable = () => {
-  function generateId() {
-    return uuidv4();
-  }
-
+  const [merchantsData, setMerchantsData] = useState([]);
+  const [test, setTest] = useState();
   const tableRef = useRef(null);
-  const companyData = [
-    {
-      id: generateId(),
-      companyName: 'Company A',
-      username: 'user1',
-      status: 'Active',
-      createdBy: 'John Doe',
-      type: 'Merchant',
-    },
-    {
-      id: generateId(),
-      companyName: 'Company B',
-      username: 'user2',
-      status: 'Inactive',
-      createdBy: 'Jane Smith',
-      type: 'Sub Merchant',
-    },
-    // Add more company objects here...
-  ];
+  const { token } = getCredentials();
+
+  console.log(test);
+  console.log(merchantsData);
+
   useEffect(() => {
     let table;
 
     if (tableRef.current) {
       table = $(tableRef.current).DataTable({
-        paging: true,
+        responsive: true,
         searching: true,
-        // Customize pagination settings here
-        lengthMenu: [10, 25, 50],
-        pageLength: 10,
+        paging: true,
+        ordering: true,
+        processing: true,
+        serverSide: true,
+        scrollX: true,
+        ajax: {
+          url: 'http://141.144.237.21:3000/fetch-merchants',
+          type: 'GET',
+          dataSrc(response) {
+            const responseBody = response.data;
+            const { totalCount } = responseBody.totalCount;
+
+            response.recordsTotal = totalCount;
+            response.recordsFiltered = totalCount;
+
+            setTest(totalCount);
+            setMerchantsData(responseBody.merchants);
+
+            return responseBody.merchants;
+          },
+
+          beforeSend: (xhr) => {
+            xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+          },
+        },
+        columns: [
+          { data: 'id' },
+          { data: 'username' },
+          { data: 'role' },
+          { data: 'created' },
+          { data: 'status' },
+          { data: null },
+        ],
       });
     }
 
@@ -49,7 +64,7 @@ const MerchantTable = () => {
         table.destroy();
       }
     };
-  }, []);
+  }, [token]);
 
   const handleSuspend = (id) => {
     // Suspend logic
@@ -66,34 +81,33 @@ const MerchantTable = () => {
           <Table ref={tableRef} id="merchantTable">
             <TableHead>
               <TableRow>
-                <TableCell>id</TableCell>
-                <TableCell>Company Name</TableCell>
+                <TableCell>ID</TableCell>
                 <TableCell>Username</TableCell>
+                <TableCell>Role</TableCell>
+                <TableCell>Created</TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell>Created By</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {companyData.map((company) => (
-                <TableRow key={company.id}>
-                  <TableCell>{company.id}</TableCell>
-                  <TableCell>{company.companyName}</TableCell>
-                  <TableCell>{company.username}</TableCell>
-                  <TableCell>{company.status}</TableCell>
-                  <TableCell>{company.createdBy === 'super-admin' ? 'Super Admin' : 'Merchant'}</TableCell>
+              {merchantsData.map((merch) => (
+                <TableRow key={merch.id}>
+                  <TableCell>{merch.id}</TableCell>
+                  <TableCell>{merch.username}</TableCell>
+                  <TableCell>{merch.role}</TableCell>
+                  <TableCell>{merch.created}</TableCell>
+                  <TableCell>{merch.status}</TableCell>
                   <TableCell>
                     <div style={{ display: 'flex' }}>
                       <Button
                         variant="contained"
                         style={{ backgroundColor: 'red', color: 'white', marginRight: '10px' }}
-                        onClick={() => handleSuspend(company.id)}
+                        onClick={() => handleSuspend(merch.id)}
                       >
                         Suspend
                       </Button>
-                      <Link to={`/dashboard/update/${company.username}`}>
-                        {' '}
-                        <Button variant="contained" color="secondary" onClick={() => handleUpdate(company.id)}>
+                      <Link to={`/dashboard/update/${merch.username}`}>
+                        <Button variant="contained" color="secondary" onClick={() => handleUpdate(merch.id)}>
                           Update
                         </Button>
                       </Link>

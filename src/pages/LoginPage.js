@@ -38,18 +38,18 @@ const StyledContent = styled('div')(({ theme }) => ({
   padding: theme.spacing(12, 0),
 }));
 
-// ----------------------------------------------------------------------
-
 export default function LoginPage() {
+  // extracting url to determine admin type
   const { pathname } = useLocation();
-  // Extract the "super-admin" part from the pathname
-  const adminType = pathname.split('/')[1]; // This will give you "super-admin"
+
+  // log "user-type"
+  const adminType = pathname.split('/')[1];
 
   console.log(adminType);
-  const mdUp = useResponsive('up', 'md');
 
-  const remValue = 2; // Equivalent of 2rem
-  const fontSize = 16; // Default font size in pixels
+  const mdUp = useResponsive('up', 'md');
+  const remValue = 2;
+  const fontSize = 16;
   const padding = `${remValue * fontSize}px`;
 
   useEffect(() => {
