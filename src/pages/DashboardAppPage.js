@@ -1,7 +1,9 @@
 import { Helmet } from 'react-helmet-async';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { Grid, Container, Typography, Card, Button } from '@mui/material';
 import { useEffect } from 'react';
+
 import { useBalances } from '../hooks/useBalances';
 import { AppWidgetSummary, MerchantTable, TransactionsTable } from '../sections/@dashboard/app';
 import Iconify from '../components/iconify';
@@ -9,10 +11,12 @@ import Iconify from '../components/iconify';
 import { CheckAuthorization } from '../utils/checkAuth';
 
 export default function DashboardAppPage() {
-  const { user, username, token } = CheckAuthorization();
+  const { user, username, token, newUsername, newPassword } = CheckAuthorization();
   const navigate = useNavigate();
 
   const { airtimeBalance, airtimeLoading, b2bBalance, b2bLoading, dataBalance, dataLoading } = useBalances(username);
+
+  console.log(token, newUsername, newPassword);
 
   useEffect(() => {
     if (!token && user === 'super-admin') {

@@ -86,3 +86,67 @@ export const sendRequest = async (user, body, token) => {
     }
   }
 };
+
+export const suspendMerchant = async (username, token) => {
+  try {
+    const { data } = await customFetch.put(
+      '/suspend-merchant',
+      { username },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    if (data.status === 200) {
+      toast.success(`${username} Has Been Suspended`, {
+        position: 'top-center',
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        theme: 'light',
+      });
+    }
+  } catch (error) {
+    console.log(error.message);
+    toast.error('Operation Failed', {
+      position: 'top-center',
+      autoClose: 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      draggable: true,
+      theme: 'light',
+    });
+  }
+};
+
+export const activateMerchant = async (username, token) => {
+  try {
+    const { data } = await customFetch.put(
+      '/activate-merchant',
+      { username },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    if (data.status === 200) {
+      toast.success(`${username} activate succesfully`, {
+        position: 'top-center',
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        theme: 'light',
+      });
+    }
+  } catch (error) {
+    console.log(error.message);
+    toast.error('Operation Failed', {
+      position: 'top-center',
+      autoClose: 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      draggable: true,
+      theme: 'light',
+    });
+  }
+};

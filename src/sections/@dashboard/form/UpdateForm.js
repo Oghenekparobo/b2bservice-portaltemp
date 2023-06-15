@@ -1,57 +1,48 @@
 import React, { useState } from 'react';
 import { Stack, IconButton, InputAdornment, TextField, Collapse } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { getCredentials } from '../../../utils/checkAuth';
+import customFetch from '../../../utils/http';
+import { CheckAuthorization } from '../../../utils/checkAuth';
 import Iconify from '../../../components/iconify';
 
 export default function UpdateForm() {
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [companyName, setCompanyName] = useState('');
+  const [newCompanyName, setNewCompanyName] = useState('');
+  const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState('');
-  const [createdSubmerchants, setCreatedSubmerchants] = useState([]);
 
-  const { user } = getCredentials();
-
-  const isUsernameUnique = (username) => !createdSubmerchants.includes(username);
-
-  const createSubmerchant = () => {
-    if (!isUsernameUnique(username)) {
-      setMessage('Username is already taken');
-    } else {
-      setCreatedSubmerchants([...createdSubmerchants, username]);
-      setMessage('merchant onboarded successfully');
-      // Perform additional logic for submerchant onboarding
-    }
-
-    // Reset form fields
-    setUsername('');
-    setPassword('');
-    setCompanyName('');
-  };
+  const { user, token } = CheckAuthorization();
 
   const handleClick = async (e) => {
     e.preventDefault();
-    if (companyName === '' || username === '' || password === '') {
+    if (username === '' || newUsername === '' || newCompanyName === '' || newPassword === '') {
       setMessage('All fields are required');
       return;
     }
 
+    console.log(username, newUsername, newCompanyName, newPassword);
     if (user === 'super-admin') {
-      if (!isUsernameUnique(username)) {
-        setMessage('Username is already taken');
-        return;
+      const body = {
+        username,
+        newUsername,
+        newName: newCompanyName,
+        newPassword,
+      };
+      try {
+        const response = await customFetch.put(
+          '/update-merchant',
+          { body },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        console.log(response);
+      } catch (error) {
+        console.log(error.message);
       }
-      createSubmerchant();
-      // Perform additional logic for super-admin
-    } else if (user === 'merchant') {
-      if (createdSubmerchants.length >= 2) {
-        setMessage('You have reached the maximum number of submerchants');
-        return;
-      }
-      createSubmerchant();
-      // Perform additional logic for merchant
     }
   };
 
@@ -63,27 +54,34 @@ export default function UpdateForm() {
         </Collapse>
 
         <TextField
-          name="companyName"
-          label="Company Name"
-          value={companyName}
-          onChange={(e) => setCompanyName(e.target.value)}
-          onBlur={() => setMessage('')}
-        />
-
-        <TextField
           name="username"
           label="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           onBlur={() => setMessage('')}
         />
+        <TextField
+          name="newCompanyName"
+          label="New Company Name"
+          value={newCompanyName}
+          onChange={(e) => setNewCompanyName(e.target.value)}
+          onBlur={() => setMessage('')}
+        />
 
         <TextField
-          name="password"
-          label="Password"
+          name="newUsername"
+          label="New Username"
+          value={newUsername}
+          onChange={(e) => setNewUsername(e.target.value)}
+          onBlur={() => setMessage('')}
+        />
+
+        <TextField
+          name="newPassword"
+          label="New Password"
           type={showPassword ? 'text' : 'password'}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
           onBlur={() => setMessage('')}
           InputProps={{
             endAdornment: (
@@ -99,18 +97,8 @@ export default function UpdateForm() {
 
       {user === 'super-admin' && (
         <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}>
-          Onboard
+          Update
         </LoadingButton>
-      )}
-
-      {user === 'merchant' && createdSubmerchants.length < 2 && (
-        <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}>
-          Onboard
-        </LoadingButton>
-      )}
-
-      {user === 'merchant' && createdSubmerchants.length >= 2 && (
-        <div>You have reached the maximum number of submerchants</div>
       )}
     </>
   );

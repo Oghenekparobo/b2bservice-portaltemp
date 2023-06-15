@@ -16,8 +16,8 @@ export const CheckAuthorization = () => {
 
     if (elapsedTime >= expirationTime) {
       // Token has expired, refresh the token
-      const newToken = 'your_new_token_here';
-      localStorage.setItem('token', newToken);
+      // const newToken = 'your_new_token_here';
+      localStorage.setItem('exp', 'exp');
       localStorage.setItem('timestamp', currentTime.toString());
     }
   };
@@ -42,6 +42,8 @@ export const reset = () => {
   localStorage.removeItem('username');
   localStorage.removeItem('user');
   localStorage.removeItem('token');
+  // remove when you want to go to production
+  localStorage.removeItem('exp');
 };
 
 export const getCredentials = () => {
@@ -51,14 +53,6 @@ export const getCredentials = () => {
 
   return { username, user, token };
 };
-
-// check if token has expired
-
-// export function checkTokenExpiry() {
-//   const { token } = getCredentials();
-//   console.log(token);
-//   return { token };
-// }
 
 export const getToken = () => {
   const token = localStorage.getItem('token');
