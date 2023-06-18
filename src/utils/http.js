@@ -25,7 +25,6 @@ export const sendRequest = async (user, body, token) => {
         draggable: true,
         theme: 'light',
       });
-      console.log(data);
     } catch (error) {
       console.log(error.message);
 
@@ -55,7 +54,6 @@ export const sendRequest = async (user, body, token) => {
         progress: undefined,
         theme: 'light',
       });
-      console.log(data);
     } catch (error) {
       console.log(error);
       if (error.response.status === 403) {

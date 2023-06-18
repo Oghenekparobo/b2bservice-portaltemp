@@ -1,140 +1,99 @@
-import React, { useEffect, useRef, useState } from 'react';
-import $ from 'jquery';
-import 'datatables.net-dt/js/dataTables.dataTables';
-import 'datatables.net-responsive-dt/css/responsive.dataTables.min.css';
-
-import { Grid, Paper, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { useState, useEffect } from 'react';
+import DataTable from 'react-data-table-component';
+import { Button, Grid } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { activateMerchant, suspendMerchant } from '../../../utils/http';
+import customFetch, { activateMerchant, suspendMerchant } from '../../../utils/http';
 import { getCredentials } from '../../../utils/checkAuth';
 
 const MerchantTable = () => {
-  const [merchantsData, setMerchantsData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const tableRef = useRef(null);
   const { token } = getCredentials();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [merchantsData, setMerchantsData] = useState([]);
+  const [totalRows, setTotalRows] = useState(0);
+  const perPage = 10;
 
-  console.log(merchantsData);
-
-  if (isLoading) {
-    console.log('true');
-  } else {
-    console.log('false');
-  }
-
+  const handlePageChange = (page) => {
+    setCurrentPage(Number(page));
+  };
+  console.log(currentPage);
   useEffect(() => {
-    let table;
-
-    if (tableRef.current) {
-      table = $(tableRef.current).DataTable({
-        serverSide: true,
-        processing: true,
-        paging: true,
-        ajax: {
-          url: 'http://141.144.237.21:3000/fetch-merchants',
-          type: 'GET',
-          data(param) {
-            const { start } = param;
-            const { length } = param;
-            param.perPage = length;
-            param.page = Math.floor(start / length) + 1;
-            return param;
-          },
-          dataSrc(response) {
-            const { totalCount } = response;
-            response.recordsTotal = totalCount;
-            response.recordsFiltered = totalCount;
-
-            response.data = response.message.merchants;
-            setIsLoading(true);
-            setMerchantsData(response.data);
-            setIsLoading(false);
-          },
-
-          beforeSend: (xhr) => {
-            xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-          },
+    const fetchMerchants = async () => {
+      const { data } = await customFetch.get('/fetch-merchants', {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          page: currentPage,
+          perPage,
         },
-        columns: [
-          { data: 'id' },
-          { data: 'username' },
-          { data: 'role' },
-          { data: 'created' },
-          { data: 'status' },
-          { data: null },
-        ],
       });
-    }
 
-    return () => {
-      if (table) {
-        table.destroy();
-      }
+      setTotalRows(data.totalCount);
+      setMerchantsData(data.message.merchants);
     };
-  }, [token]);
+
+    fetchMerchants();
+  }, [token, currentPage]);
+
+  const columns = [
+    { name: 'Ref ID', selector: (row) => row.id },
+    { name: 'Company', selector: (row) => row.name },
+    { name: 'Role', selector: (row) => row.role },
+    { name: 'Username', selector: (row) => row.username },
+    { name: 'Status', selector: (row) => row.status },
+    {
+      name: 'Actions',
+      selector: (row) => (
+        <div style={{ display: 'flex' }}>
+          <Button
+            variant="contained"
+            style={{ backgroundColor: 'red', color: 'white', marginRight: '10px' }}
+            onClick={() => handleSuspend(row.username)}
+          >
+            Suspend
+          </Button>
+          <Button
+            variant="contained"
+            style={{ backgroundColor: 'green', color: 'white', marginRight: '10px' }}
+            onClick={() => handleActivate(row.username)}
+          >
+            Activate
+          </Button>
+          <Link to={`/dashboard/update/${row.username}`}>
+            <Button variant="contained" color="secondary">
+              Update
+            </Button>
+          </Link>
+        </div>
+      ),
+    },
+  ];
 
   const handleSuspend = (username) => {
     suspendMerchant(username, token);
   };
+
   const handleActivate = (username) => {
     activateMerchant(username, token);
   };
 
   return (
     <Grid item xs={12} sm={12} md={12}>
-      <div style={{ overflowX: 'auto' }}>
-        <TableContainer component={Paper}>
-          <Table ref={tableRef} id="merchantTable">
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Username</TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell>Created</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {!isLoading &&
-                merchantsData.length > 0 &&
-                merchantsData.map((merch) => (
-                  <TableRow key={merch.id}>
-                    <TableCell>{merch.id}</TableCell>
-                    <TableCell>{merch.username}</TableCell>
-                    <TableCell>{merch.role}</TableCell>
-                    <TableCell>{merch.created}</TableCell>
-                    <TableCell>{merch.status}</TableCell>
-                    <TableCell>
-                      <div style={{ display: 'flex' }}>
-                        <Button
-                          variant="contained"
-                          style={{ backgroundColor: 'red', color: 'white', marginRight: '10px' }}
-                          onClick={() => handleSuspend(merch.username)}
-                        >
-                          Suspend
-                        </Button>
-                        <Button
-                          variant="contained"
-                          style={{ backgroundColor: 'green', color: 'white', marginRight: '10px' }}
-                          onClick={() => handleActivate(merch.username)}
-                        >
-                          Activate
-                        </Button>
-                        <Link to={`/dashboard/update/${merch.username}`}>
-                          <Button variant="contained" color="secondary">
-                            Update
-                          </Button>
-                        </Link>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
+      <DataTable
+        title="merchants"
+        pagination
+        paginationServer
+        paginationTotalRows={totalRows}
+        paginationPerPage={perPage}
+        onChangePage={handlePageChange}
+        columns={columns}
+        data={merchantsData}
+        fixedHeader
+        highlightOnHover
+        subHeaderComponent={
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <input type="text" placeholder="Search here" />
+          </div>
+        }
+      />
     </Grid>
   );
 };

@@ -37,9 +37,11 @@ export default function DashboardAppPage() {
       </Helmet>
 
       <Container maxWidth="xl">
-        <Typography variant="h4" sx={{ mb: 1 }}>
-          {username}
-        </Typography>
+        {user === 'merchant' && (
+          <Typography variant="h4" sx={{ mb: 1 }}>
+            {username}
+          </Typography>
+        )}
 
         <Grid container spacing={1} justifyContent="space-between">
           {user === 'merchant' ? (
@@ -72,9 +74,7 @@ export default function DashboardAppPage() {
             </>
           ) : (
             <Grid item xs={12} sm={12} md={12}>
-              <Link to="/dashboard/merchants">
-                <AppWidgetSummary title="Merchants" total={24} icon={'ant-design:android-filled'} />
-              </Link>
+              <span style={{ fontWeight: 'bold' }}>{username}</span>
             </Grid>
           )}
         </Grid>
@@ -101,7 +101,7 @@ export default function DashboardAppPage() {
           )}
         </Grid>
 
-        <Card sx={{ overflowX: 'auto', overflowY: 'auto', maxHeight: '500px', padding: '4rem' }}>
+        <Card sx={{ overflowX: 'auto', overflowY: 'auto', maxHeight: '500px', padding: '1rem' }}>
           {user === 'merchant' ? <TransactionsTable /> : <MerchantTable />}
         </Card>
       </Container>
