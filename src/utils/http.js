@@ -1,4 +1,6 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -85,17 +87,46 @@ export const sendRequest = async (user, body, token) => {
   }
 };
 
-export const suspendMerchant = async (username, token) => {
-  try {
-    const { data } = await customFetch.put(
-      '/suspend-merchant',
-      { username },
-      {
-        headers: { Authorization: `Bearer ${token}` },
+export const useActionMerchant = () => {
+  const queryClient = useQueryClient();
+  const { mutate: actionMerchant, isLoading } = useMutation({
+    mutationFn: async ({ username, token, type }) => {
+      const { data } = await customFetch.put(
+        type === 'activate' ? '/activate-merchant' : '/suspend-merchant',
+        { username },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      return { data, username, type };
+    },
+    onSuccess: ({ data, username, type }) => {
+      queryClient.invalidateQueries({ queryKey: 'fetch-merchants' });
+      if (data.status === 200) {
+        if (type === 'activate') {
+          toast.success(`${username} activated successfully`, {
+            position: 'top-center',
+            autoClose: 1000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            draggable: true,
+            theme: 'light',
+          });
+        }
+      } else if (type === 'suspend') {
+        toast.success(`${username} has been suspended`, {
+          position: 'top-center',
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          draggable: true,
+          theme: 'light',
+        });
       }
-    );
-    if (data.status === 200) {
-      toast.success(`${username} Has Been Suspended`, {
+    },
+    onError: (error) => {
+      console.log(error.message);
+      toast.error('Operation Failed', {
         position: 'top-center',
         autoClose: 1000,
         hideProgressBar: false,
@@ -103,31 +134,40 @@ export const suspendMerchant = async (username, token) => {
         draggable: true,
         theme: 'light',
       });
-    }
-  } catch (error) {
-    console.log(error.message);
-    toast.error('Operation Failed', {
-      position: 'top-center',
-      autoClose: 1000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      draggable: true,
-      theme: 'light',
-    });
-  }
+    },
+  });
+
+  return { actionMerchant, isLoading };
 };
 
-export const activateMerchant = async (username, token) => {
-  try {
-    const { data } = await customFetch.put(
-      '/activate-merchant',
-      { username },
-      {
+export const useUpdateMerchant = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate('/');
+  const { mutate: updateMerchant, isLoading } = useMutation({
+    mutationFn: async ({ body, token }) => {
+      const { data } = await customFetch.put('/update-merchant', body, {
         headers: { Authorization: `Bearer ${token}` },
+      });
+      return { data };
+    },
+    onSuccess: ({ data }) => {
+      queryClient.invalidateQueries({ queryKey: 'fetch-merchants' });
+      if (data.status === 200) {
+        toast.success('Updated Succesfully ', {
+          position: 'top-center',
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          theme: 'light',
+        });
+        setTimeout(() => {
+          navigate('/');
+        }, 3000);
       }
-    );
-    if (data.status === 200) {
-      toast.success(`${username} activate succesfully`, {
+    },
+    onError: (error) => {
+      console.log(error.message);
+      toast.error('Operation Failed', {
         position: 'top-center',
         autoClose: 1000,
         hideProgressBar: false,
@@ -135,16 +175,8 @@ export const activateMerchant = async (username, token) => {
         draggable: true,
         theme: 'light',
       });
-    }
-  } catch (error) {
-    console.log(error.message);
-    toast.error('Operation Failed', {
-      position: 'top-center',
-      autoClose: 1000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      draggable: true,
-      theme: 'light',
-    });
-  }
+    },
+  });
+
+  return { updateMerchant, isLoading };
 };

@@ -3,11 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { Grid, Container, Typography, Card, Button } from '@mui/material';
 import { useEffect } from 'react';
-
 import { useBalances } from '../hooks/useBalances';
 import { AppWidgetSummary, MerchantTable, TransactionsTable } from '../sections/@dashboard/app';
 import Iconify from '../components/iconify';
-
 import { CheckAuthorization } from '../utils/checkAuth';
 
 export default function DashboardAppPage() {
@@ -101,9 +99,7 @@ export default function DashboardAppPage() {
           )}
         </Grid>
 
-        <Card sx={{ overflowX: 'auto', overflowY: 'auto', maxHeight: '500px', padding: '1rem' }}>
-          {user === 'merchant' ? <TransactionsTable /> : <MerchantTable />}
-        </Card>
+        <Card sx={{ padding: '1rem' }}>{user === 'merchant' ? <TransactionsTable /> : <MerchantTable />}</Card>
       </Container>
     </>
   );

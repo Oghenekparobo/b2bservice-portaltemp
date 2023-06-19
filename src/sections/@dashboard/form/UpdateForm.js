@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Stack, IconButton, InputAdornment, TextField, Collapse } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import customFetch from '../../../utils/http';
+import customFetch, { useUpdateMerchant } from '../../../utils/http';
 import { CheckAuthorization } from '../../../utils/checkAuth';
 import Iconify from '../../../components/iconify';
 
 export default function UpdateForm() {
-  const [username, setUsername] = useState('');
+  const location = useLocation();
+  const path = location.pathname;
+  const parts = path.split('/');
+  const usernameParam = parts[parts.length - 1];
+
+  const { updateMerchant, isLoading } = useUpdateMerchant();
+
   const [newCompanyName, setNewCompanyName] = useState('');
   const [newUsername, setNewUsername] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -18,31 +25,23 @@ export default function UpdateForm() {
 
   const handleClick = async (e) => {
     e.preventDefault();
-    if (username === '' || newUsername === '' || newCompanyName === '' || newPassword === '') {
+    if (usernameParam === '' || newUsername === '' || newCompanyName === '' || newPassword === '') {
       setMessage('All fields are required');
       return;
     }
 
-    console.log(username, newUsername, newCompanyName, newPassword);
+    console.log(usernameParam, newUsername, newCompanyName, newPassword);
     if (user === 'super-admin') {
       const body = {
-        username,
-        newUsername,
+        username: usernameParam,
         newName: newCompanyName,
+        newUsername,
         newPassword,
+        airtimeID: '',
+        dataID: '',
+        b2bID: '',
       };
-      try {
-        const response = await customFetch.put(
-          '/update-merchant',
-          { body },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        console.log(response);
-      } catch (error) {
-        console.log(error.message);
-      }
+      updateMerchant({ body, token });
     }
   };
 
@@ -53,13 +52,7 @@ export default function UpdateForm() {
           <div style={{ color: 'red', marginTop: '0.5rem', transition: 'all 0.3s' }}>{message}</div>
         </Collapse>
 
-        <TextField
-          name="username"
-          label="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          onBlur={() => setMessage('')}
-        />
+        <TextField name="username" label="Username" value={usernameParam} disabled />
         <TextField
           name="newCompanyName"
           label="New Company Name"
@@ -96,8 +89,15 @@ export default function UpdateForm() {
       </Stack>
 
       {user === 'super-admin' && (
-        <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}>
-          Update
+        <LoadingButton
+          fullWidth
+          size="large"
+          type="submit"
+          variant="contained"
+          onClick={handleClick}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Updating...' : ' Update'}
         </LoadingButton>
       )}
     </>

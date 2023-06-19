@@ -1,62 +1,104 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import DataTable from 'react-data-table-component';
-import { Button, Grid } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
+import { Button, CircularProgress, Grid, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import customFetch, { activateMerchant, suspendMerchant } from '../../../utils/http';
+import { styled } from '@mui/material/styles';
+import customFetch, { useActionMerchant } from '../../../utils/http';
 import { getCredentials } from '../../../utils/checkAuth';
 
+const LoadingContainer = styled('div')({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '100%',
+});
+
+const LoadingMessage = styled(Typography)(({ theme }) => ({
+  fontWeight: 'bold',
+  fontSize: 24,
+  animation: `${theme.transitions.create('opacity', {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.standard,
+  })} blink 1s infinite`,
+}));
+
+const StyledInput = styled('input')({
+  width: '100%',
+  padding: '10px',
+  marginTop: '10px',
+  marginBottom: '10px',
+  boxSizing: 'border-box',
+  borderRadius: '4px',
+  border: '1px solid #ccc',
+  fontSize: '16px',
+});
+
 const MerchantTable = () => {
+  const { actionMerchant } = useActionMerchant();
   const { token } = getCredentials();
-  const [currentPage, setCurrentPage] = useState(1);
+  const [page, setPage] = useState(1);
   const [merchantsData, setMerchantsData] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
-  const perPage = 10;
+  const perPage = 20;
 
-  const handlePageChange = (page) => {
-    setCurrentPage(Number(page));
-  };
-  console.log(currentPage);
-  useEffect(() => {
-    const fetchMerchants = async () => {
+  const { isLoading, data } = useQuery({
+    queryKey: ['fetch-merchants'],
+    queryFn: async () => {
       const { data } = await customFetch.get('/fetch-merchants', {
         headers: { Authorization: `Bearer ${token}` },
         params: {
-          page: currentPage,
+          page,
           perPage,
         },
       });
-
-      setTotalRows(data.totalCount);
+      return data;
+    },
+    onSuccess: (data) => {
       setMerchantsData(data.message.merchants);
-    };
+    },
+  });
 
-    fetchMerchants();
-  }, [token, currentPage]);
+  console.log(data, merchantsData);
 
   const columns = [
-    { name: 'Ref ID', selector: (row) => row.id },
-    { name: 'Company', selector: (row) => row.name },
-    { name: 'Role', selector: (row) => row.role },
-    { name: 'Username', selector: (row) => row.username },
-    { name: 'Status', selector: (row) => row.status },
+    { name: 'COMPANY', selector: (row) => row.name },
+    { name: 'ROLE', selector: (row) => row.role },
+    { name: 'USERNAME', selector: (row) => row.username },
+    { name: 'STATUS', selector: (row) => row.status },
     {
-      name: 'Actions',
+      name: 'ACTIONS',
+      selector: (row) => (
+        <div>
+          {row.status === 'ACTIVE' ? (
+            <Button
+              variant="contained"
+              style={{ backgroundColor: 'red', color: 'white', marginRight: '10px' }}
+              onClick={() => {
+                const confirmSuspension = window.confirm('Are you sure you want to suspend this merchant?');
+                if (confirmSuspension) {
+                  actionMerchant({ username: row.username, token, type: 'suspend' });
+                }
+              }}
+            >
+              Suspend
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              style={{ backgroundColor: 'green', color: 'white', marginRight: '10px' }}
+              onClick={() => actionMerchant({ username: row.username, token, type: 'activate' })}
+            >
+              Activate
+            </Button>
+          )}
+        </div>
+      ),
+    },
+    {
+      name: 'UPDATE',
       selector: (row) => (
         <div style={{ display: 'flex' }}>
-          <Button
-            variant="contained"
-            style={{ backgroundColor: 'red', color: 'white', marginRight: '10px' }}
-            onClick={() => handleSuspend(row.username)}
-          >
-            Suspend
-          </Button>
-          <Button
-            variant="contained"
-            style={{ backgroundColor: 'green', color: 'white', marginRight: '10px' }}
-            onClick={() => handleActivate(row.username)}
-          >
-            Activate
-          </Button>
           <Link to={`/dashboard/update/${row.username}`}>
             <Button variant="contained" color="secondary">
               Update
@@ -67,33 +109,79 @@ const MerchantTable = () => {
     },
   ];
 
-  const handleSuspend = (username) => {
-    suspendMerchant(username, token);
+  const handlePageChange = (page) => {
+    setPage(page);
   };
 
-  const handleActivate = (username) => {
-    activateMerchant(username, token);
+  const handleSort = (e) => {
+    const searchQuery = e.target.value;
+    if (searchQuery !== '') {
+      const newMerchantsData = merchantsData.filter((merchant) => merchant.username.includes(searchQuery));
+      setMerchantsData(newMerchantsData);
+    } else {
+      setMerchantsData([...merchantsData]);
+    }
   };
 
   return (
     <Grid item xs={12} sm={12} md={12}>
-      <DataTable
-        title="merchants"
-        pagination
-        paginationServer
-        paginationTotalRows={totalRows}
-        paginationPerPage={perPage}
-        onChangePage={handlePageChange}
-        columns={columns}
-        data={merchantsData}
-        fixedHeader
-        highlightOnHover
-        subHeaderComponent={
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <input type="text" placeholder="Search here" />
-          </div>
-        }
-      />
+      {isLoading ? (
+        <LoadingContainer>
+          <CircularProgress size={50} />
+          <LoadingMessage variant="h6">Fetching Merchants....</LoadingMessage>
+        </LoadingContainer>
+      ) : (
+        <>
+          <StyledInput type="text" placeholder="Search Merchants" onChange={handleSort} />
+          <DataTable
+            pagination
+            paginationServer
+            paginationTotalRows={totalRows}
+            paginationPerPage={perPage}
+            fixedHeader
+            fixedHeaderScrollHeight="500px"
+            highlightOnHover
+            columns={columns}
+            data={merchantsData}
+            onChangePage={handlePageChange}
+            paginationComponentOptions={{
+              noRowsPerPage: true,
+            }}
+            customStyles={{
+              tableWrapper: {
+                overflowX: 'auto',
+                overflowY: 'auto',
+                padding: '10px',
+              },
+              tableWrapperOverflow: {
+                overflow: 'visible',
+              },
+              headRow: {
+                style: {
+                  background: 'darkred',
+                },
+              },
+              headCells: {
+                style: {
+                  color: 'white',
+                  fontWeight: 'bold',
+                  paddingTop: '10px',
+                },
+                rows: {
+                  style: {
+                    borderBottom: '1px solid #ddd',
+                  },
+                },
+                cells: {
+                  style: {
+                    padding: '10px',
+                  },
+                },
+              },
+            }}
+          />
+        </>
+      )}
     </Grid>
   );
 };
