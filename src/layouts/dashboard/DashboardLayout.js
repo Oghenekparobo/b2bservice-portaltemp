@@ -5,12 +5,9 @@ import { Outlet } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 
 import { getCredentials } from '../../utils/checkAuth';
-// import { useUserContext } from '../../context/userContext';
-//
+
 import Header from './header';
 import Nav from './nav';
-
-// ----------------------------------------------------------------------
 
 const APP_BAR_MOBILE = 64;
 const APP_BAR_DESKTOP = 92;
@@ -33,8 +30,6 @@ const Main = styled('div')(({ theme }) => ({
     paddingRight: theme.spacing(2),
   },
 }));
-
-// ----------------------------------------------------------------------
 
 export default function DashboardLayout() {
   const [open, setOpen] = useState(false);

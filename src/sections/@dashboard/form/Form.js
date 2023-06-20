@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+// import axios from 'axios';
 
 import { Stack, IconButton, InputAdornment, TextField, Collapse } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
@@ -32,10 +33,11 @@ export default function Form() {
     };
 
     setLoading(true);
-    await sendRequest(user, body, token);
+
+    await sendRequest(user, body);
+
     setLoading(false);
   };
-
   return (
     <>
       <Stack spacing={3} sx={{ my: 2 }}>

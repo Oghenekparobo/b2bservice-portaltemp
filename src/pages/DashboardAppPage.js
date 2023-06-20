@@ -6,12 +6,13 @@ import { useEffect } from 'react';
 import { useBalances } from '../hooks/useBalances';
 import { AppWidgetSummary, MerchantTable, TransactionsTable } from '../sections/@dashboard/app';
 import Iconify from '../components/iconify';
+import customFetch from '../utils/http';
 import { CheckAuthorization } from '../utils/checkAuth';
 
 export default function DashboardAppPage() {
   const { user, username, token, newUsername, newPassword } = CheckAuthorization();
   const navigate = useNavigate();
-
+  customFetch.setNavigation(navigate);
   const { airtimeBalance, airtimeLoading, b2bBalance, b2bLoading, dataBalance, dataLoading } = useBalances(username);
 
   console.log(token, newUsername, newPassword);

@@ -1,18 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
-import customFetch from '../utils/http';
+import axios from 'axios';
+
+const balanceFetch = axios.create({
+  baseURL: 'http://141.144.237.21:3000',
+});
 
 export const useBalances = (username) => {
   const fetchAirtime = async () => {
-    const { data } = await customFetch.post('/fetch-airtimeBalance', { username });
+    const { data } = await balanceFetch.post('/fetch-airtimeBalance', { username });
     return data;
   };
   const fetchData = async () => {
-    const { data } = await customFetch.post('/fetch-dataBalance', { username });
+    const { data } = await balanceFetch.post('/fetch-dataBalance', { username });
     return data;
   };
 
   const fetchB2b = async () => {
-    const { data } = await customFetch.post('/fetch-b2bBalance', { username });
+    const { data } = await balanceFetch.post('/fetch-b2bBalance', { username });
     return data;
   };
 

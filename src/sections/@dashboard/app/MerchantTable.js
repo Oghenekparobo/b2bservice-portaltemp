@@ -3,9 +3,9 @@ import DataTable from 'react-data-table-component';
 import { useQuery } from '@tanstack/react-query';
 import { Button, CircularProgress, Grid, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import { styled } from '@mui/material/styles';
 import customFetch, { useActionMerchant } from '../../../utils/http';
-import { getCredentials } from '../../../utils/checkAuth';
 
 const LoadingContainer = styled('div')({
   display: 'flex',
@@ -36,17 +36,15 @@ const StyledInput = styled('input')({
 
 const MerchantTable = () => {
   const { actionMerchant } = useActionMerchant();
-  const { token } = getCredentials();
   const [page, setPage] = useState(1);
   const [merchantsData, setMerchantsData] = useState([]);
   const [totalRows, setTotalRows] = useState(0);
-  const perPage = 20;
+  const perPage = 10;
 
   const { isLoading, data } = useQuery({
     queryKey: ['fetch-merchants'],
     queryFn: async () => {
       const { data } = await customFetch.get('/fetch-merchants', {
-        headers: { Authorization: `Bearer ${token}` },
         params: {
           page,
           perPage,
@@ -59,6 +57,9 @@ const MerchantTable = () => {
     },
   });
 
+  const handlePageChange = (page) => {
+    setPage(page);
+  };
   console.log(data, merchantsData);
 
   const columns = [
@@ -75,10 +76,20 @@ const MerchantTable = () => {
               variant="contained"
               style={{ backgroundColor: 'red', color: 'white', marginRight: '10px' }}
               onClick={() => {
-                const confirmSuspension = window.confirm('Are you sure you want to suspend this merchant?');
-                if (confirmSuspension) {
-                  actionMerchant({ username: row.username, token, type: 'suspend' });
-                }
+                Swal.fire({
+                  title: 'Are you sure?',
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'Yes, Suspend  Merchant',
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    Swal.fire(`${row.username} Has been suspended`);
+
+                    actionMerchant({ username: row.username, type: 'suspend' });
+                  }
+                });
               }}
             >
               Suspend
@@ -87,7 +98,7 @@ const MerchantTable = () => {
             <Button
               variant="contained"
               style={{ backgroundColor: 'green', color: 'white', marginRight: '10px' }}
-              onClick={() => actionMerchant({ username: row.username, token, type: 'activate' })}
+              onClick={() => actionMerchant({ username: row.username, type: 'activate' })}
             >
               Activate
             </Button>
@@ -109,9 +120,7 @@ const MerchantTable = () => {
     },
   ];
 
-  const handlePageChange = (page) => {
-    setPage(page);
-  };
+  console.log(page);
 
   const handleSort = (e) => {
     const searchQuery = e.target.value;
@@ -134,19 +143,20 @@ const MerchantTable = () => {
         <>
           <StyledInput type="text" placeholder="Search Merchants" onChange={handleSort} />
           <DataTable
+            progressPending={isLoading}
             pagination
             paginationServer
-            paginationTotalRows={totalRows}
             paginationPerPage={perPage}
+            paginationTotalRows={totalRows}
             fixedHeader
-            fixedHeaderScrollHeight="500px"
+            fixedHeaderScrollHeight="600px"
             highlightOnHover
             columns={columns}
-            data={merchantsData}
-            onChangePage={handlePageChange}
-            paginationComponentOptions={{
-              noRowsPerPage: true,
-            }}
+            data={merchantsData && merchantsData}
+            onChangePage={(page) => handlePageChange(page)}
+            // paginationComponentOptions={{
+            //   noRowsPerPage: true,
+            // }}
             customStyles={{
               tableWrapper: {
                 overflowX: 'auto',
@@ -158,7 +168,7 @@ const MerchantTable = () => {
               },
               headRow: {
                 style: {
-                  background: 'darkred',
+                  background: 'Crimson',
                 },
               },
               headCells: {

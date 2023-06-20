@@ -1,6 +1,10 @@
+import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import customFetch from '../utils/http';
+
+const loginFetch = axios.create({
+  baseURL: 'http://141.144.237.21:3000',
+});
 
 export const useLogin = () => {
   const navigate = useNavigate();
@@ -15,7 +19,7 @@ export const useLogin = () => {
           username: inputUsername,
           password: inputPassword,
         };
-        const { data } = await customFetch.post('http://141.144.237.21:3000/login', body);
+        const { data } = await loginFetch.post('http://141.144.237.21:3000/login', body);
 
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', adminType);
@@ -37,7 +41,7 @@ export const useLogin = () => {
           username: inputUsername,
           password: inputPassword,
         };
-        const { data } = await customFetch.post('http://141.144.237.21:3000/login', body);
+        const { data } = await loginFetch.post('http://141.144.237.21:3000/login', body);
 
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', 'merchant');

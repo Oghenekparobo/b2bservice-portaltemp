@@ -11,7 +11,7 @@ const navConfig = [
     icon: icon('ic_analytics'),
   },
   {
-    title: user === 'merchant' ? 'sub-merchant' : user === 'super-admin' ? 'merchants' : 'default-merchant',
+    title: user === 'super-admin' && 'merchants',
     path:
       user === 'merchant'
         ? '/dashboard/sub-merchant'
