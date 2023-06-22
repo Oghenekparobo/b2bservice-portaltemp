@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
-import { useQuery } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 import { Button, CircularProgress, Grid, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { styled } from '@mui/material/styles';
-import customFetch, { useActionMerchant } from '../../../utils/http';
+import customFetch, { activateMerchant } from '../../../utils/http';
 
 const LoadingContainer = styled('div')({
   display: 'flex',
@@ -35,32 +35,79 @@ const StyledInput = styled('input')({
 });
 
 const MerchantTable = () => {
-  const { actionMerchant } = useActionMerchant();
-  const [page, setPage] = useState(1);
   const [merchantsData, setMerchantsData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
-  const perPage = 10;
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
 
-  const { isLoading, data } = useQuery({
-    queryKey: ['fetch-merchants'],
-    queryFn: async () => {
-      const { data } = await customFetch.get('/fetch-merchants', {
-        params: {
-          page,
-          perPage,
-        },
-      });
-      return data;
-    },
-    onSuccess: (data) => {
-      setMerchantsData(data.message.merchants);
-    },
-  });
+  console.log(merchantsData, totalRows);
+
+  const fetchMerchants = async (page, newPerPage) => {
+    setLoading(true);
+    const { data } = await customFetch.get(`/fetch-merchants?page=${page}&perPage=${newPerPage}`);
+    setMerchantsData(data.message.merchants);
+    setTotalRows(data.message.totalCount);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchMerchants(page, perPage);
+  }, [page, perPage]);
 
   const handlePageChange = (page) => {
-    setPage(page);
+    fetchMerchants(page, perPage);
   };
-  console.log(data, merchantsData);
+
+  const handlePerRowsChange = async (newPerPage, page) => {
+    fetchMerchants(page, newPerPage);
+  };
+
+  const handleSort = (e) => {
+    const searchQuery = e.target.value;
+    if (searchQuery !== '') {
+      const newMerchantsData = merchantsData.filter((merchant) => merchant.username.includes(searchQuery));
+      setMerchantsData(newMerchantsData);
+    } else {
+      setMerchantsData([...merchantsData]);
+    }
+  };
+
+  const handleSuspend = async (username) => {
+    try {
+      const data = await customFetch.put('/suspend-merchant', username);
+      fetchMerchants(page, perPage);
+    } catch (error) {
+      console.log(error.message);
+      toast.error('Operation Failed', {
+        position: 'top-center',
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        theme: 'light',
+      });
+    }
+  };
+
+  const handleActivate = async (username) => {
+    try {
+      const { data } = await customFetch.put('/activate-merchant', username);
+
+      console.log(data);
+      fetchMerchants(page, perPage);
+    } catch (error) {
+      console.log(error.message);
+      toast.error('Operation Failed', {
+        position: 'top-center',
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        theme: 'light',
+      });
+    }
+  };
 
   const columns = [
     { name: 'COMPANY', selector: (row) => row.name },
@@ -87,7 +134,7 @@ const MerchantTable = () => {
                   if (result.isConfirmed) {
                     Swal.fire(`${row.username} Has been suspended`);
 
-                    actionMerchant({ username: row.username, type: 'suspend' });
+                    handleSuspend({ username: row.username });
                   }
                 });
               }}
@@ -98,7 +145,7 @@ const MerchantTable = () => {
             <Button
               variant="contained"
               style={{ backgroundColor: 'green', color: 'white', marginRight: '10px' }}
-              onClick={() => actionMerchant({ username: row.username, type: 'activate' })}
+              onClick={() => handleActivate({ username: row.username })}
             >
               Activate
             </Button>
@@ -120,21 +167,9 @@ const MerchantTable = () => {
     },
   ];
 
-  console.log(page);
-
-  const handleSort = (e) => {
-    const searchQuery = e.target.value;
-    if (searchQuery !== '') {
-      const newMerchantsData = merchantsData.filter((merchant) => merchant.username.includes(searchQuery));
-      setMerchantsData(newMerchantsData);
-    } else {
-      setMerchantsData([...merchantsData]);
-    }
-  };
-
   return (
     <Grid item xs={12} sm={12} md={12}>
-      {isLoading ? (
+      {loading ? (
         <LoadingContainer>
           <CircularProgress size={50} />
           <LoadingMessage variant="h6">Fetching Merchants....</LoadingMessage>
@@ -143,20 +178,17 @@ const MerchantTable = () => {
         <>
           <StyledInput type="text" placeholder="Search Merchants" onChange={handleSort} />
           <DataTable
-            progressPending={isLoading}
+            data={merchantsData && merchantsData}
+            columns={columns}
+            progressPending={loading}
             pagination
             paginationServer
-            paginationPerPage={perPage}
             paginationTotalRows={totalRows}
+            onChangeRowsPerPage={handlePerRowsChange}
+            onChangePage={handlePageChange}
             fixedHeader
             fixedHeaderScrollHeight="600px"
             highlightOnHover
-            columns={columns}
-            data={merchantsData && merchantsData}
-            onChangePage={(page) => handlePageChange(page)}
-            // paginationComponentOptions={{
-            //   noRowsPerPage: true,
-            // }}
             customStyles={{
               tableWrapper: {
                 overflowX: 'auto',
@@ -177,15 +209,15 @@ const MerchantTable = () => {
                   fontWeight: 'bold',
                   paddingTop: '10px',
                 },
-                rows: {
-                  style: {
-                    borderBottom: '1px solid #ddd',
-                  },
+              },
+              rows: {
+                style: {
+                  borderBottom: '1px solid #ddd',
                 },
-                cells: {
-                  style: {
-                    padding: '10px',
-                  },
+              },
+              cells: {
+                style: {
+                  padding: '10px',
                 },
               },
             }}

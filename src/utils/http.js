@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+// import { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -86,6 +87,53 @@ customFetch.interceptors.response.use(
 
 export default customFetch;
 
+export const activateMerchant = async (username, type) => {
+  try {
+    const url = type === 'activate' ? '/activate-merchant' : '/suspend-merchant';
+
+    const response = await axios.put(url, { username });
+
+    console.Console.log(response);
+
+    // if (data.status === 200) {
+    //   toast.success(`${username} activate succesfully`, {
+    //     position: 'top-center',
+    //     autoClose: 1000,
+    //     hideProgressBar: false,
+    //     closeOnClick: true,
+    //     draggable: true,
+    //     theme: 'light',
+    //   });
+    // }
+  } catch (error) {
+    console.log(error.message);
+    toast.error('Operation Failed', {
+      position: 'top-center',
+      autoClose: 1000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      draggable: true,
+      theme: 'light',
+    });
+  }
+};
+// export const useFetchMerchants = (page, perPage) => {
+//   const { isLoading, data } = useQuery({
+//     queryKey: ['fetch-merchants'],
+//     queryFn: async () => {
+//       const { data } = await customFetch.get('/fetch-merchants', {
+//         params: {
+//           page,
+//           perPage,
+//         },
+//       });
+//       return data;
+//     },
+//   });
+
+//   return { isLoading, data };
+// };
+
 export const sendRequest = async (user, body) => {
   if (user === 'super-admin') {
     try {
@@ -126,77 +174,56 @@ export const sendRequest = async (user, body) => {
     }
   }
 };
-export const useActionMerchant = () => {
-  const queryClient = useQueryClient();
-  const { mutate: actionMerchant, isLoading } = useMutation({
-    mutationFn: async ({ username, type }) => {
-      const { data } = await customFetch.put(type === 'activate' ? '/activate-merchant' : '/suspend-merchant', {
-        username,
-      });
-      return { data, username, type };
-    },
-    onSuccess: ({ data, username, type }) => {
-      queryClient.invalidateQueries({ queryKey: 'fetch-merchants' });
-      if (data.status === 200) {
-        if (type === 'activate') {
-          toast.success(`${username} activated successfully`, {
-            position: 'top-center',
-            autoClose: 1000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            draggable: true,
-            theme: 'light',
-          });
-        }
-      } else if (type === 'suspend') {
-        toast.success(`${username} has been suspended`, {
-          position: 'top-center',
-          autoClose: 1000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          draggable: true,
-          theme: 'light',
-        });
-      }
-    },
-    onError: (error) => {
-      console.log(error.message);
-      toast.error('Operation Failed', {
-        position: 'top-center',
-        autoClose: 1000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        draggable: true,
-        theme: 'light',
-      });
-    },
-  });
 
-  return { actionMerchant, isLoading };
-};
+// export const useHandleActions = () => {
+//   const [isLoading, setIsLoading] = useState();
+
+//   const handleActions = async (username, type) => {
+//     try {
+//       setIsLoading(true);
+//       const url = type === 'activate' ? 'activate-merchant' : '/suspend-merchant';
+//       const data = await customFetch.put(url, username);
+//       console.log(data);
+//       setIsLoading(false);
+//     } catch (error) {
+//       console.log(error.message);
+//       toast.error('Operation Failed', {
+//         position: 'top-center',
+//         autoClose: 1000,
+//         hideProgressBar: false,
+//         closeOnClick: true,
+//         draggable: true,
+//         theme: 'light',
+//       });
+//     }
+//   };
+
+//   return { handleActions, isLoading };
+
+// };
 
 export const useUpdateMerchant = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate('/');
   const { mutate: updateMerchant, isLoading } = useMutation({
-    mutationFn: async ({ body }) => {
+    mutationFn: async (body) => {
+      console.log(body);
       const { data } = await customFetch.put('/update-merchant', body);
-      return { data };
+      console.log(body, data);
     },
-    onSuccess: ({ data }) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: 'fetch-merchants' });
-      if (data.status === 200) {
-        toast.success('Updated Succesfully ', {
-          position: 'top-center',
-          autoClose: 1000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          theme: 'light',
-        });
-        setTimeout(() => {
-          navigate('/');
-        }, 3000);
-      }
+
+      toast.success('Updated Succesfully ', {
+        position: 'top-center',
+        autoClose: 1000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        theme: 'light',
+      });
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
     },
     onError: (error) => {
       console.log(error.message);

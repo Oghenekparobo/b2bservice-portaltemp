@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Stack, IconButton, InputAdornment, TextField, Collapse } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import customFetch, { useUpdateMerchant } from '../../../utils/http';
+import { useUpdateMerchant } from '../../../utils/http';
 import { CheckAuthorization } from '../../../utils/checkAuth';
 import Iconify from '../../../components/iconify';
 
@@ -41,7 +41,7 @@ export default function UpdateForm() {
         dataID: '',
         b2bID: '',
       };
-      updateMerchant({ body, token });
+      updateMerchant(body);
     }
   };
 
