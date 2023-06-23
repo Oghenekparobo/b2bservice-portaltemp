@@ -5,7 +5,7 @@ import { Button, CircularProgress, Grid, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { styled } from '@mui/material/styles';
-import customFetch, { activateMerchant } from '../../../utils/http';
+import customFetch from '../../../utils/http';
 
 const LoadingContainer = styled('div')({
   display: 'flex',
@@ -23,29 +23,35 @@ const LoadingMessage = styled(Typography)(({ theme }) => ({
   })} blink 1s infinite`,
 }));
 
-const StyledInput = styled('input')({
-  width: '100%',
-  padding: '10px',
-  marginTop: '10px',
+const SearchContainer = styled('div')({
+  display: 'flex',
+  alignItems: 'center',
   marginBottom: '10px',
-  boxSizing: 'border-box',
+});
+
+const SearchInput = styled('input')({
+  flex: 1,
+  padding: '8px',
+  marginRight: '10px',
   borderRadius: '4px',
   border: '1px solid #ccc',
   fontSize: '16px',
 });
-
 const MerchantTable = () => {
   const [merchantsData, setMerchantsData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalRows, setTotalRows] = useState(0);
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(25);
+  const [perPage, setPerPage] = useState(10);
+  const [searchValue, setSearchValue] = useState('');
+  const [newMerchant, setNewMerchant] = useState([]);
 
-  console.log(merchantsData, totalRows);
+  // console.log(merchantsData, totalRows);
 
   const fetchMerchants = async (page, newPerPage) => {
     setLoading(true);
     const { data } = await customFetch.get(`/fetch-merchants?page=${page}&perPage=${newPerPage}`);
+    console.log(data);
     setMerchantsData(data.message.merchants);
     setTotalRows(data.message.totalCount);
     setLoading(false);
@@ -53,7 +59,7 @@ const MerchantTable = () => {
 
   useEffect(() => {
     fetchMerchants(page, perPage);
-  }, [page, perPage]);
+  }, [page, perPage, newMerchant]);
 
   const handlePageChange = (page) => {
     fetchMerchants(page, perPage);
@@ -62,17 +68,23 @@ const MerchantTable = () => {
   const handlePerRowsChange = async (newPerPage, page) => {
     fetchMerchants(page, newPerPage);
   };
-
-  const handleSort = (e) => {
-    const searchQuery = e.target.value;
-    if (searchQuery !== '') {
-      const newMerchantsData = merchantsData.filter((merchant) => merchant.username.includes(searchQuery));
-      setMerchantsData(newMerchantsData);
-    } else {
-      setMerchantsData([...merchantsData]);
+  const handleSort = async () => {
+    if (searchValue !== '') {
+      try {
+        const username = searchValue;
+        setLoading(true);
+        const { data } = await customFetch.post('/find-merchant', { username });
+        console.log(data);
+        setNewMerchant([data?.message]);
+        setMerchantsData(newMerchant);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
+  console.log(merchantsData);
   const handleSuspend = async (username) => {
     try {
       const data = await customFetch.put('/suspend-merchant', username);
@@ -176,7 +188,13 @@ const MerchantTable = () => {
         </LoadingContainer>
       ) : (
         <>
-          <StyledInput type="text" placeholder="Search Merchants" onChange={handleSort} />
+          <SearchContainer>
+            <SearchInput type="text" placeholder="Username" onChange={(e) => setSearchValue(e.target.value)} />
+            <Button variant="contained" style={{ backgroundColor: 'blue', color: 'white' }} onClick={handleSort}>
+              Search
+            </Button>
+          </SearchContainer>
+
           <DataTable
             data={merchantsData && merchantsData}
             columns={columns}

@@ -15,8 +15,6 @@ export default function DashboardAppPage() {
   customFetch.setNavigation(navigate);
   const { airtimeBalance, airtimeLoading, b2bBalance, b2bLoading, dataBalance, dataLoading } = useBalances(username);
 
-  console.log(token, newUsername, newPassword);
-
   useEffect(() => {
     if (!token && user === 'super-admin') {
       navigate('/super-admin/login');
