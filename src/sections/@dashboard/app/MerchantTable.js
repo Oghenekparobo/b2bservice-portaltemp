@@ -40,34 +40,44 @@ const SearchInput = styled('input')({
 const MerchantTable = () => {
   const [merchantsData, setMerchantsData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [totalRows, setTotalRows] = useState(0);
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
   const [searchValue, setSearchValue] = useState('');
+  const [totalRows, setTotalRows] = useState(0);
+  const [perPage, setPerPage] = useState(10);
   const [newMerchant, setNewMerchant] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // console.log(merchantsData, totalRows);
 
-  const fetchMerchants = async (page, newPerPage) => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fetchMerchants = async (page) => {
     setLoading(true);
-    const { data } = await customFetch.get(`/fetch-merchants?page=${page}&perPage=${newPerPage}`);
+    const { data } = await customFetch.get(`/fetch-merchants?page=${page}&perPage=${perPage}`);
     console.log(data);
     setMerchantsData(data.message.merchants);
-    setTotalRows(data.message.totalCount);
+    // setTotalRows(data.message.totalCount);
+    setTotalRows(30);
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchMerchants(page, perPage);
-  }, [page, perPage, newMerchant]);
+    fetchMerchants(currentPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
 
   const handlePageChange = (page) => {
-    fetchMerchants(page, perPage);
+    console.log('page', page);
+    setCurrentPage(page);
+    fetchMerchants(page);
   };
 
   const handlePerRowsChange = async (newPerPage, page) => {
-    fetchMerchants(page, newPerPage);
+    setPerPage(newPerPage);
+    setCurrentPage(page);
+    fetchMerchants(page);
   };
+
+  console.log(currentPage);
+
   const handleSort = async () => {
     if (searchValue !== '') {
       try {
@@ -84,11 +94,10 @@ const MerchantTable = () => {
     }
   };
 
-  console.log(merchantsData);
   const handleSuspend = async (username) => {
     try {
+      // eslint-disable-next-line no-unused-vars
       const data = await customFetch.put('/suspend-merchant', username);
-      fetchMerchants(page, perPage);
     } catch (error) {
       console.log(error.message);
       toast.error('Operation Failed', {
@@ -104,10 +113,8 @@ const MerchantTable = () => {
 
   const handleActivate = async (username) => {
     try {
-      const { data } = await customFetch.put('/activate-merchant', username);
-
-      console.log(data);
-      fetchMerchants(page, perPage);
+      // eslint-disable-next-line no-unused-vars
+      const data = await customFetch.put('/activate-merchant', username);
     } catch (error) {
       console.log(error.message);
       toast.error('Operation Failed', {
@@ -196,8 +203,8 @@ const MerchantTable = () => {
           </SearchContainer>
 
           <DataTable
-            data={merchantsData && merchantsData}
             columns={columns}
+            data={merchantsData}
             progressPending={loading}
             pagination
             paginationServer
@@ -206,39 +213,39 @@ const MerchantTable = () => {
             onChangePage={handlePageChange}
             fixedHeader
             fixedHeaderScrollHeight="600px"
-            highlightOnHover
-            customStyles={{
-              tableWrapper: {
-                overflowX: 'auto',
-                overflowY: 'auto',
-                padding: '10px',
-              },
-              tableWrapperOverflow: {
-                overflow: 'visible',
-              },
-              headRow: {
-                style: {
-                  background: 'Crimson',
-                },
-              },
-              headCells: {
-                style: {
-                  color: 'white',
-                  fontWeight: 'bold',
-                  paddingTop: '10px',
-                },
-              },
-              rows: {
-                style: {
-                  borderBottom: '1px solid #ddd',
-                },
-              },
-              cells: {
-                style: {
-                  padding: '10px',
-                },
-              },
-            }}
+            // highlightOnHover
+            // customStyles={{
+            //   tableWrapper: {
+            //     overflowX: 'auto',
+            //     overflowY: 'auto',
+            //     padding: '10px',
+            //   },
+            //   tableWrapperOverflow: {
+            //     overflow: 'visible',
+            //   },
+            //   headRow: {
+            //     style: {
+            //       background: 'Crimson',
+            //     },
+            //   },
+            //   headCells: {
+            //     style: {
+            //       color: 'white',
+            //       fontWeight: 'bold',
+            //       paddingTop: '10px',
+            //     },
+            //   },
+            //   rows: {
+            //     style: {
+            //       borderBottom: '1px solid #ddd',
+            //     },
+            //   },
+            //   cells: {
+            //     style: {
+            //       padding: '10px',
+            //     },
+            //   },
+            // }}
           />
         </>
       )}
