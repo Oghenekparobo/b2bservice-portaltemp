@@ -34,6 +34,18 @@ customFetch.interceptors.response.use(
           navigation('/super-admin/login');
         }
       }
+
+      if (error.response.data.status === 404 && error.response.data.message === 'Merchant not found') {
+        toast.error('Merchant was not found.', {
+          position: 'top-center',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+        });
+      }
     }
 
     if (user === 'merchant') {
@@ -45,7 +57,6 @@ customFetch.interceptors.response.use(
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
-          pauseOnHover: true,
           draggable: true,
           progress: undefined,
           theme: 'light',
@@ -62,7 +73,6 @@ customFetch.interceptors.response.use(
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
-          pauseOnHover: true,
           draggable: true,
           progress: undefined,
           theme: 'light',
@@ -76,7 +86,6 @@ customFetch.interceptors.response.use(
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
-        pauseOnHover: true,
         draggable: true,
         progress: undefined,
         theme: 'light',
@@ -92,19 +101,6 @@ export const activateMerchant = async (username, type) => {
     const url = type === 'activate' ? '/activate-merchant' : '/suspend-merchant';
 
     const response = await axios.put(url, { username });
-
-    console.Console.log(response);
-
-    // if (data.status === 200) {
-    //   toast.success(`${username} activate succesfully`, {
-    //     position: 'top-center',
-    //     autoClose: 1000,
-    //     hideProgressBar: false,
-    //     closeOnClick: true,
-    //     draggable: true,
-    //     theme: 'light',
-    //   });
-    // }
   } catch (error) {
     console.log(error.message);
     toast.error('Operation Failed', {
@@ -117,22 +113,6 @@ export const activateMerchant = async (username, type) => {
     });
   }
 };
-// export const useFetchMerchants = (page, perPage) => {
-//   const { isLoading, data } = useQuery({
-//     queryKey: ['fetch-merchants'],
-//     queryFn: async () => {
-//       const { data } = await customFetch.get('/fetch-merchants', {
-//         params: {
-//           page,
-//           perPage,
-//         },
-//       });
-//       return data;
-//     },
-//   });
-
-//   return { isLoading, data };
-// };
 
 export const sendRequest = async (user, body) => {
   if (user === 'super-admin') {
@@ -144,7 +124,6 @@ export const sendRequest = async (user, body) => {
           autoClose: 500,
           hideProgressBar: false,
           closeOnClick: true,
-          pauseOnHover: true,
           draggable: true,
           theme: 'light',
         });
@@ -162,7 +141,7 @@ export const sendRequest = async (user, body) => {
           autoClose: 500,
           hideProgressBar: false,
           closeOnClick: true,
-          pauseOnHover: true,
+
           draggable: true,
           progress: undefined,
           theme: 'light',
@@ -174,33 +153,6 @@ export const sendRequest = async (user, body) => {
     }
   }
 };
-
-// export const useHandleActions = () => {
-//   const [isLoading, setIsLoading] = useState();
-
-//   const handleActions = async (username, type) => {
-//     try {
-//       setIsLoading(true);
-//       const url = type === 'activate' ? 'activate-merchant' : '/suspend-merchant';
-//       const data = await customFetch.put(url, username);
-//       console.log(data);
-//       setIsLoading(false);
-//     } catch (error) {
-//       console.log(error.message);
-//       toast.error('Operation Failed', {
-//         position: 'top-center',
-//         autoClose: 1000,
-//         hideProgressBar: false,
-//         closeOnClick: true,
-//         draggable: true,
-//         theme: 'light',
-//       });
-//     }
-//   };
-
-//   return { handleActions, isLoading };
-
-// };
 
 export const useUpdateMerchant = () => {
   const queryClient = useQueryClient();
@@ -226,7 +178,6 @@ export const useUpdateMerchant = () => {
       }, 2000);
     },
     onError: (error) => {
-      console.log(error.message);
       toast.error('Operation Failed', {
         position: 'top-center',
         autoClose: 1000,

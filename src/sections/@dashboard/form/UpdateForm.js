@@ -21,7 +21,7 @@ export default function UpdateForm() {
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState('');
 
-  const { user, token } = CheckAuthorization();
+  const { user } = CheckAuthorization();
 
   const handleClick = async (e) => {
     e.preventDefault();
@@ -30,7 +30,6 @@ export default function UpdateForm() {
       return;
     }
 
-    console.log(usernameParam, newUsername, newCompanyName, newPassword);
     if (user === 'super-admin') {
       const body = {
         username: usernameParam,

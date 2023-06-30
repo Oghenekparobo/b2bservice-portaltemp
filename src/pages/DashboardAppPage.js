@@ -10,7 +10,7 @@ import customFetch from '../utils/http';
 import { CheckAuthorization } from '../utils/checkAuth';
 
 export default function DashboardAppPage() {
-  const { user, username, token, newUsername, newPassword } = CheckAuthorization();
+  const { user, username, token } = CheckAuthorization();
   const navigate = useNavigate();
   customFetch.setNavigation(navigate);
   const { airtimeBalance, airtimeLoading, b2bBalance, b2bLoading, dataBalance, dataLoading } = useBalances(username);

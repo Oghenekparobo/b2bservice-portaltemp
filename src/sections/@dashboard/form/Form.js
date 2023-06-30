@@ -15,9 +15,7 @@ export default function Form() {
   const [showPassword, setShowPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { user, token } = getCredentials();
-
-  console.log(token);
+  const { user } = getCredentials();
 
   const handleClick = async (e) => {
     e.preventDefault();

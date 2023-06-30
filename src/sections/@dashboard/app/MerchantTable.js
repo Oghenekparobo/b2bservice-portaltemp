@@ -43,16 +43,13 @@ const MerchantTable = () => {
   const [searchValue, setSearchValue] = useState('');
   const [totalRows, setTotalRows] = useState(0);
   const [perPage, setPerPage] = useState(10);
-  const [newMerchant, setNewMerchant] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-
-  // console.log(merchantsData, totalRows);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchMerchants = async (page) => {
     setLoading(true);
     const { data } = await customFetch.get(`/fetch-merchants?page=${page}&perPage=${perPage}`);
-    console.log(data);
+    // console.log(data);
     setMerchantsData(data.message.merchants);
     // setTotalRows(data.message.totalCount);
     setTotalRows(30);
@@ -65,7 +62,7 @@ const MerchantTable = () => {
   }, [currentPage]);
 
   const handlePageChange = (page) => {
-    console.log('page', page);
+    // console.log('page', page);
     setCurrentPage(page);
     fetchMerchants(page);
   };
@@ -76,20 +73,19 @@ const MerchantTable = () => {
     fetchMerchants(page);
   };
 
-  console.log(currentPage);
+  // console.log(currentPage);
 
-  const handleSort = async () => {
+  const handleSearch = async () => {
     if (searchValue !== '') {
       try {
         const username = searchValue;
         setLoading(true);
-        const { data } = await customFetch.post('/find-merchant', { username });
-        console.log(data);
-        setNewMerchant([data?.message]);
-        setMerchantsData(newMerchant);
+        const data = await customFetch.post('/find-merchant', { username });
+        setMerchantsData([data?.data?.message]);
         setLoading(false);
       } catch (error) {
-        console.log(error);
+        setLoading(false);
+        setMerchantsData([]);
       }
     }
   };
@@ -98,8 +94,8 @@ const MerchantTable = () => {
     try {
       // eslint-disable-next-line no-unused-vars
       const data = await customFetch.put('/suspend-merchant', username);
+      fetchMerchants(currentPage);
     } catch (error) {
-      console.log(error.message);
       toast.error('Operation Failed', {
         position: 'top-center',
         autoClose: 1000,
@@ -115,8 +111,8 @@ const MerchantTable = () => {
     try {
       // eslint-disable-next-line no-unused-vars
       const data = await customFetch.put('/activate-merchant', username);
+      fetchMerchants(currentPage);
     } catch (error) {
-      console.log(error.message);
       toast.error('Operation Failed', {
         position: 'top-center',
         autoClose: 1000,
@@ -197,7 +193,7 @@ const MerchantTable = () => {
         <>
           <SearchContainer>
             <SearchInput type="text" placeholder="Username" onChange={(e) => setSearchValue(e.target.value)} />
-            <Button variant="contained" style={{ backgroundColor: 'blue', color: 'white' }} onClick={handleSort}>
+            <Button variant="contained" style={{ backgroundColor: 'blue', color: 'white' }} onClick={handleSearch}>
               Search
             </Button>
           </SearchContainer>
