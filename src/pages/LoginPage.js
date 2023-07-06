@@ -70,9 +70,9 @@ export default function LoginPage() {
             position: 'fixed',
             top: { xs: 16, sm: 24, md: 40 },
             left: { xs: 16, sm: 24, md: 40 },
-            width: '200px', // Adjust the width as per your requirement
-            height: 'auto', // Adjust the height proportionally based on the width
-            padding, // Set the calculated padding-top value
+            width: '200px',
+            height: 'auto',
+            padding,
           }}
         />
         {mdUp && adminType !== 'super-admin' && (

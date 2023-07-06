@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Grid, Container, Typography, Card, Button } from '@mui/material';
 import { useEffect } from 'react';
 import { useBalances } from '../hooks/useBalances';
-import { AppWidgetSummary, MerchantTable, TransactionsTable } from '../sections/@dashboard/app';
+import { AppWidgetSummary, MerchantTable } from '../sections/@dashboard/app';
 import Iconify from '../components/iconify';
 import customFetch from '../utils/http';
 import { CheckAuthorization } from '../utils/checkAuth';
@@ -23,7 +23,7 @@ export default function DashboardAppPage() {
     }
 
     if (!token) {
-      navigate('/login');
+      navigate('/super-admin/login');
     }
   }, [navigate, user, token]);
 
@@ -34,12 +34,11 @@ export default function DashboardAppPage() {
       </Helmet>
 
       <Container maxWidth="xl">
-        {user === 'merchant' && (
-          <Typography variant="h4" sx={{ mb: 1 }}>
+        {/* {user === 'merchant' && (
+          <Typography variant="h4" sx={{ mb: 4, opacity: 0.2, letterSpacing: '0.5rem', fontWeight: 'bold' }}>
             {username}
           </Typography>
-        )}
-
+        )} */}
         <Grid container spacing={1} justifyContent="space-between">
           {user === 'merchant' ? (
             <>
@@ -78,7 +77,7 @@ export default function DashboardAppPage() {
         <Grid item xs={12} sm={6} md={3} sx={{ textAlign: 'right', marginTop: '2rem', marginBottom: '2rem' }}>
           {user === 'merchant' ? (
             <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 'bold', padding: '16px' }}>
-              Transactions
+              {/* Transactions */}
             </Typography>
           ) : (
             <Link to="/dashboard/onboard">
@@ -97,8 +96,71 @@ export default function DashboardAppPage() {
             </Link>
           )}
         </Grid>
-
-        <Card sx={{ padding: '1rem' }}>{user === 'merchant' ? <TransactionsTable /> : <MerchantTable />}</Card>
+        {/* see transactions for merchants and list of merchants */}
+        <Card sx={{ padding: '1rem' }}>
+          {user === 'merchant' ? (
+            <>
+              <Grid container spacing={1} justifyContent="space-between">
+                <Grid item xs={12} sm={6} md={3} sx={{ textAlign: 'left', marginTop: '2rem', marginBottom: '2rem' }}>
+                  {user === 'merchant' && (
+                    <Link to="/dashboard/balance/airtime">
+                      <Button
+                        variant="contained"
+                        startIcon={<Iconify icon="eva:plus-fill" />}
+                        sx={{
+                          backgroundColor: 'Crimson',
+                          '&:hover': {
+                            backgroundColor: 'Crimson',
+                          },
+                        }}
+                      >
+                        See Airtime Transactions
+                      </Button>
+                    </Link>
+                  )}
+                </Grid>
+                <Grid item xs={12} sm={6} md={3} sx={{ textAlign: 'left', marginTop: '2rem', marginBottom: '2rem' }}>
+                  {user === 'merchant' && (
+                    <Link to="/dashboard/balance/data">
+                      <Button
+                        variant="contained"
+                        startIcon={<Iconify icon="eva:plus-fill" />}
+                        sx={{
+                          backgroundColor: 'Crimson',
+                          '&:hover': {
+                            backgroundColor: 'Crimson',
+                          },
+                        }}
+                      >
+                        See Data Transactions
+                      </Button>
+                    </Link>
+                  )}
+                </Grid>
+                <Grid item xs={12} sm={6} md={3} sx={{ textAlign: 'left', marginTop: '2rem', marginBottom: '2rem' }}>
+                  {user === 'merchant' && (
+                    <Link to="/dashboard/balance/b2b">
+                      <Button
+                        variant="contained"
+                        startIcon={<Iconify icon="eva:plus-fill" />}
+                        sx={{
+                          backgroundColor: 'Crimson',
+                          '&:hover': {
+                            backgroundColor: 'Crimson',
+                          },
+                        }}
+                      >
+                        See B2B Transactions
+                      </Button>
+                    </Link>
+                  )}
+                </Grid>
+              </Grid>
+            </>
+          ) : (
+            <MerchantTable />
+          )}
+        </Card>
       </Container>
     </>
   );

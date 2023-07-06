@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Box, Drawer } from '@mui/material';
+import { getCredentials } from '../../../utils/checkAuth';
 import useResponsive from '../../../hooks/useResponsive';
 import Scrollbar from '../../../components/scrollbar';
 import NavSection from '../../../components/nav-section';
@@ -15,6 +16,7 @@ Nav.propTypes = {
 };
 
 export default function Nav({ openNav, onCloseNav }) {
+  const { user } = getCredentials();
   const { pathname } = useLocation();
   const remValue = 2; // Equivalent of 2rem
   const fontSize = 16; // Default font size in pixels
@@ -44,7 +46,7 @@ export default function Nav({ openNav, onCloseNav }) {
             position: 'fixed',
             top: { xs: 16, sm: 24, md: 40 },
             left: { xs: 16, sm: 24, md: 40 },
-            width: '160px', // Adjust the width as per your requirement
+            width: '230px', // Adjust the width as per your requirement
             height: 'auto', // Adjust the height proportionally based on the width
             padding, // Set the calculated padding-top value
           }}
@@ -72,7 +74,7 @@ export default function Nav({ openNav, onCloseNav }) {
         PaperProps={{
           sx: {
             width: NAV_WIDTH,
-            bgcolor: 'Crimson',
+            bgcolor: user === 'merchant' ? '#cc0033' : 'Crimson',
             boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
             borderRightStyle: isDesktop ? 'dashed' : 'none',
           },

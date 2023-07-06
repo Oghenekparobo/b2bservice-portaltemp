@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 import { Button, CircularProgress, Grid, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { styled } from '@mui/material/styles';
+import { getCredentials } from '../../../utils/checkAuth';
 import customFetch from '../../../utils/http';
 
 const LoadingContainer = styled('div')({
@@ -43,49 +45,65 @@ const MerchantTable = () => {
   const [searchValue, setSearchValue] = useState('');
   const [totalRows, setTotalRows] = useState(0);
   const [perPage, setPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
 
+  const navigate = useNavigate();
+
+  const { token } = getCredentials();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchMerchants = async (page) => {
     setLoading(true);
     const { data } = await customFetch.get(`/fetch-merchants?page=${page}&perPage=${perPage}`);
-    // console.log(data);
+    console.log('data', data);
     setMerchantsData(data.message.merchants);
-    // setTotalRows(data.message.totalCount);
-    setTotalRows(30);
+    setTotalRows(data.totalCount);
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchMerchants(currentPage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
-
   const handlePageChange = (page) => {
-    // console.log('page', page);
-    setCurrentPage(page);
     fetchMerchants(page);
   };
 
   const handlePerRowsChange = async (newPerPage, page) => {
+    setLoading(true);
+    const { data } = await customFetch.get(`/fetch-merchants?page=${page}&perPage=${newPerPage}`);
+    setMerchantsData(data.message.merchants);
     setPerPage(newPerPage);
-    setCurrentPage(page);
-    fetchMerchants(page);
+    setLoading(false);
   };
 
-  // console.log(currentPage);
+  useEffect(() => {
+    fetchMerchants(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  console.log(merchantsData);
 
   const handleSearch = async () => {
     if (searchValue !== '') {
       try {
         const username = searchValue;
         setLoading(true);
-        const data = await customFetch.post('/find-merchant', { username });
+        const data = await axios.post(
+          'http://141.144.237.21:3000/find-merchant',
+          { username },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setMerchantsData([data?.data?.message]);
+        console.log(data);
         setLoading(false);
       } catch (error) {
         setLoading(false);
-        setMerchantsData([]);
+        if (error.response.data.status === 404) {
+          setMerchantsData([]);
+        }
+
+        if (error.response.data.status === 401 || error.response.data.status === 403) {
+          navigate('/super-admin/login');
+        }
       }
     }
   };
@@ -94,7 +112,7 @@ const MerchantTable = () => {
     try {
       // eslint-disable-next-line no-unused-vars
       const data = await customFetch.put('/suspend-merchant', username);
-      fetchMerchants(currentPage);
+      fetchMerchants(1);
     } catch (error) {
       toast.error('Operation Failed', {
         position: 'top-center',
@@ -111,7 +129,7 @@ const MerchantTable = () => {
     try {
       // eslint-disable-next-line no-unused-vars
       const data = await customFetch.put('/activate-merchant', username);
-      fetchMerchants(currentPage);
+      fetchMerchants(1);
     } catch (error) {
       toast.error('Operation Failed', {
         position: 'top-center',
@@ -205,6 +223,7 @@ const MerchantTable = () => {
             pagination
             paginationServer
             paginationTotalRows={totalRows}
+            noDataComponent={<p>No Merchants found</p>}
             onChangeRowsPerPage={handlePerRowsChange}
             onChangePage={handlePageChange}
             fixedHeader

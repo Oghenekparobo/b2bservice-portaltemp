@@ -25,6 +25,11 @@ export default function UpdateForm() {
 
   const handleClick = async (e) => {
     e.preventDefault();
+
+    if (!/\S+@\S+\.\S+/.test(newUsername)) {
+      setMessage('Username must be an E-mail address');
+      return;
+    }
     if (usernameParam === '' || newUsername === '' || newCompanyName === '' || newPassword === '') {
       setMessage('All fields are required');
       return;
@@ -59,9 +64,9 @@ export default function UpdateForm() {
           onChange={(e) => setNewCompanyName(e.target.value)}
           onBlur={() => setMessage('')}
         />
-
         <TextField
           name="newUsername"
+          type="email"
           label="New Username"
           value={newUsername}
           onChange={(e) => setNewUsername(e.target.value)}

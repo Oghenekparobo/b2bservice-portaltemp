@@ -22,7 +22,7 @@ export default function Update() {
     }
 
     if (!token) {
-      navigate('/login');
+      navigate('/super-admin/login');
     }
   }, [navigate, token, user, isRedirect]);
   return (

@@ -19,6 +19,12 @@ export default function Form() {
 
   const handleClick = async (e) => {
     e.preventDefault();
+
+    if (!/\S+@\S+\.\S+/.test(username)) {
+      setMessage('Username must be an E-mail address');
+      return;
+    }
+
     if (companyName === '' || username === '' || password === '') {
       setMessage('All fields are required');
       return;
@@ -53,6 +59,7 @@ export default function Form() {
 
         <TextField
           name="username"
+          type="email"
           label="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}

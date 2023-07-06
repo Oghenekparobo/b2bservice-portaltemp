@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-// import { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -49,7 +48,7 @@ customFetch.interceptors.response.use(
     }
 
     if (user === 'merchant') {
-      console.log('merchant', error.response.data.status);
+      // console.log('merchant', error.response.data.status);
 
       if (error.response.data.status === 401) {
         toast.error('Session Expired.', {
@@ -100,6 +99,7 @@ export const activateMerchant = async (username, type) => {
   try {
     const url = type === 'activate' ? '/activate-merchant' : '/suspend-merchant';
 
+    // eslint-disable-next-line no-unused-vars
     const response = await axios.put(url, { username });
   } catch (error) {
     console.log(error.message);
@@ -129,7 +129,7 @@ export const sendRequest = async (user, body) => {
         });
       }
     } catch (error) {
-      console.log(error.message);
+      // console.log(error.message);
     }
   } else if (user === 'merchant') {
     try {
@@ -148,7 +148,7 @@ export const sendRequest = async (user, body) => {
         });
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       // The error will be handled by the interceptor
     }
   }
@@ -159,9 +159,9 @@ export const useUpdateMerchant = () => {
   const navigate = useNavigate('/');
   const { mutate: updateMerchant, isLoading } = useMutation({
     mutationFn: async (body) => {
-      console.log(body);
+      // eslint-disable-next-line no-unused-vars
       const { data } = await customFetch.put('/update-merchant', body);
-      console.log(body, data);
+      // console.log(body, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: 'fetch-merchants' });
@@ -177,6 +177,7 @@ export const useUpdateMerchant = () => {
         navigate('/');
       }, 2000);
     },
+    // eslint-disable-next-line no-unused-vars
     onError: (error) => {
       toast.error('Operation Failed', {
         position: 'top-center',
