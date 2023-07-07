@@ -1,72 +1,254 @@
-import { useEffect, useRef } from 'react';
-import { Grid, Paper } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import $ from 'jquery';
-import 'datatables.net-dt/js/dataTables.dataTables';
+import DataTable from 'react-data-table-component';
 
-// Import DataTables CSS
-import 'datatables.net-dt/css/jquery.dataTables.min.css';
-import 'datatables.net-responsive-dt/css/responsive.dataTables.min.css';
+export default function TransactionsTable() {
+  // A super simple expandable component.
 
-const StyledTableContainer = styled(Grid)(({ theme }) => ({
-  padding: theme.spacing(2),
-}));
-
-const TransactionsTable = () => {
-  const tableRef = useRef(null);
-
-  const dummyData = [
-    { id: '4d5e6f', name: 'Jane Smith', type: 'Data', transaction: 'Transaction 2', amount: '$2000', status: 'Failed' },
+  const columns = [
     {
-      id: '1a2b3c',
-      name: 'John Doe',
-      type: 'b2b',
-      transaction: 'Transaction 1',
-      amount: '$1000',
-      status: 'Success',
+      name: 'amount',
+      selector: (row) => row.amount,
+    },
+    {
+      name: 'balanceBefore',
+      selector: (row) => row.balanceBefore,
+    },
+    {
+      name: 'billerCategory',
+      selector: (row) => row.billerCategory,
+    },
+    {
+      name: 'billerDescription',
+      selector: (row) => row.billerDescription,
+    },
+    {
+      name: 'billerId',
+      selector: (row) => row.billerId,
+    },
+    {
+      name: 'commission',
+      selector: (row) => row.commission,
+    },
+    {
+      name: 'customerId',
+      selector: (row) => row.customerId,
+    },
+    {
+      name: 'dateCreated',
+      selector: (row) => row.dateCreated,
+    },
+    {
+      name: 'extraInfo',
+      selector: (row) => row.extraInfo,
+    },
+    {
+      name: 'referenceId',
+      selector: (row) => row.referenceId,
+    },
+    {
+      name: ' requestId',
+      selector: (row) => row.requestId,
+    },
+    {
+      name: 'reversed',
+      selector: (row) => row.reversed,
+    },
+    {
+      name: 'status',
+      selector: (row) => row.status,
+    },
+    {
+      name: 'walletDescription',
+      selector: (row) => row.walletDescription,
     },
   ];
 
-  useEffect(() => {
-    const table = $(tableRef.current);
-    table.DataTable({
-      responsive: true,
-    });
-
-    return () => {
-      // Destroy DataTables instance on unmounting
-      table.DataTable().destroy();
-    };
-  }, []);
+  const data = [
+    {
+      amount: '1000',
+      balanceBefore: '9501',
+      billerCategory: 'disco',
+      billerDescription: 'IBEDC Prepaid',
+      billerId: 'IBEDCA',
+      commission: '10',
+      customerId: '12345678910',
+      dateCreated: '19-JUN-23 04.05.34.521432 PM',
+      extraInfo: null,
+      referenceId: '1687187134516423282126',
+      requestId: '7982',
+      reversed: 'Yes',
+      status: 'Failed',
+      walletDescription: 'IBEDC Prepaid for 12345678910',
+    },
+    {
+      amount: '1000',
+      balanceBefore: '9501',
+      billerCategory: 'disco',
+      billerDescription: 'IBEDC Prepaid',
+      billerId: 'IBEDCA',
+      commission: '10',
+      customerId: '12345678910',
+      dateCreated: '19-JUN-23 04.05.34.521432 PM',
+      extraInfo: null,
+      referenceId: '1687187134516423282126',
+      requestId: '7982',
+      reversed: 'Yes',
+      status: 'Failed',
+      walletDescription: 'IBEDC Prepaid for 12345678910',
+    },
+    {
+      amount: '1000',
+      balanceBefore: '9501',
+      billerCategory: 'disco',
+      billerDescription: 'IBEDC Prepaid',
+      billerId: 'IBEDCA',
+      commission: '10',
+      customerId: '12345678910',
+      dateCreated: '19-JUN-23 04.00.47.077905 PM',
+      extraInfo: null,
+      referenceId: '1687186847072925696132',
+      requestId: '7981',
+      reversed: 'Yes',
+      status: 'Failed',
+      walletDescription: 'IBEDC Prepaid for 12345678910',
+    },
+    {
+      amount: '1000',
+      balanceBefore: '9501',
+      billerCategory: 'disco',
+      billerDescription: 'IBEDC Prepaid',
+      billerId: 'IBEDCA',
+      commission: '10',
+      customerId: '12345678910',
+      dateCreated: '19-JUN-23 03.59.47.446994 PM',
+      extraInfo: null,
+      referenceId: '1687186787441322194288',
+      requestId: '7980',
+      reversed: 'Yes',
+      status: 'Failed',
+      walletDescription: 'IBEDC Prepaid for 12345678910',
+    },
+    {
+      amount: '1000',
+      balanceBefore: '9501',
+      billerCategory: 'disco',
+      billerDescription: 'IBEDC Prepaid',
+      billerId: 'IBEDCA',
+      commission: '10',
+      customerId: '12345678910',
+      dateCreated: '19-JUN-23 03.54.44.768821 PM',
+      extraInfo: null,
+      referenceId: '1687186484763526151440',
+      requestId: '7999',
+      reversed: 'Yes',
+      status: 'Failed',
+      walletDescription: 'IBEDC Prepaid for 12345678910',
+    },
+    {
+      amount: '1000',
+      balanceBefore: '9501',
+      billerCategory: 'disco',
+      billerDescription: 'IBEDC Prepaid',
+      billerId: 'IBEDCA',
+      commission: '10',
+      customerId: '12345678910',
+      dateCreated: '19-JUN-23 03.32.42.567204 PM',
+      extraInfo: null,
+      referenceId: '1687185162561435907031',
+      requestId: '7998',
+      reversed: 'Yes',
+      status: 'Failed',
+      walletDescription: 'IBEDC Prepaid for 12345678910',
+    },
+    {
+      amount: '1000',
+      balanceBefore: '9501',
+      billerCategory: 'disco',
+      billerDescription: 'IBEDC Prepaid',
+      billerId: 'IBEDCA',
+      commission: '10',
+      customerId: '12345678910',
+      dateCreated: '19-JUN-23 03.29.33.323799 PM',
+      extraInfo: null,
+      referenceId: '1687184973310670447127',
+      requestId: '7997',
+      reversed: 'Yes',
+      status: 'Failed',
+      walletDescription: 'IBEDC Prepaid for 12345678910',
+    },
+    {
+      amount: '1000',
+      balanceBefore: '10501',
+      billerCategory: 'banking',
+      billerDescription: 'Fund Transfer',
+      billerId: 'FTOUTWARD',
+      commission: '0',
+      customerId: '3057071087',
+      dateCreated: '05-JUN-23 05.22.18.254236 PM',
+      extraInfo:
+        '{"Sender":"Chika Ladipo","Beneficiary Account":3057071087,"Beneficiary Account Name":"Gabriel Oluwadamilare Oyetunde","Bank Name":"FIRST BANK OF NIGERIA","Bank Institution Code":"000016","Session ID":"110015230605172125413499046800","Bank Verification Number":"22261459689","Service Charge":8}',
+      referenceId: '1685982138245541318238',
+      requestId: '77701',
+      reversed: 'No',
+      status: 'Success',
+      walletDescription: 'Fund Transfer to 3057071087',
+    },
+    {
+      amount: '100',
+      balanceBefore: '10601',
+      billerCategory: 'banking',
+      billerDescription: 'Fund Transfer',
+      billerId: 'FTOUTWARD',
+      commission: '0',
+      customerId: '3057071087',
+      dateCreated: '05-JUN-23 05.16.27.517819 PM',
+      extraInfo:
+        '{"Sender":"Chika Ladipo","Beneficiary Account":3057071087,"Beneficiary Account Name":"Gabriel Oluwadamilare Oyetunde","Bank Name":"FIRST BANK OF NIGERIA","Bank Institution Code":"000016","Session ID":"110015230605171052806041747617","Bank Verification Number":"22261459689","Service Charge":8}',
+      referenceId: '1685981787511286491313',
+      requestId: '7777',
+      reversed: 'No',
+      status: 'Success',
+      walletDescription: 'Fund Transfer to 3057071087',
+    },
+    {
+      amount: '100',
+      balanceBefore: '10701',
+      billerCategory: 'banking',
+      billerDescription: 'Fund Transfer',
+      billerId: 'FTOUTWARD',
+      commission: '0',
+      customerId: '3057071087',
+      dateCreated: '05-JUN-23 05.11.46.358363 PM',
+      extraInfo:
+        '{"Sender":"Chika Ladipo","Beneficiary Account":3057071087,"Beneficiary Account Name":"Gabriel Oluwadamilare Oyetunde","Bank Name":"FIRST BANK OF NIGERIA","Bank Institution Code":"000016","Session ID":"110015230605171052806041747617","Bank Verification Number":"22261459689","Service Charge":8}',
+      referenceId: '1685981506349875997962',
+      requestId: '7776',
+      reversed: 'No',
+      status: 'Success',
+      walletDescription: 'Fund Transfer to 3057071087',
+    },
+    {
+      amount: '100',
+      balanceBefore: '10801',
+      billerCategory: 'banking',
+      billerDescription: 'Fund Transfer',
+      billerId: 'FTOUTWARD',
+      commission: '0',
+      customerId: '3057071087',
+      dateCreated: '05-JUN-23 05.04.06.920408 PM',
+      extraInfo:
+        '{"Sender":"Chika Ladipo","Beneficiary Account":3057071087,"Beneficiary Account Name":"Gabriel Oluwadamilare Oyetunde","Bank Name":"FIRST BANK OF NIGERIA","Bank Institution Code":"000016","Session ID":"110015230601193248307130194506","Bank Verification Number":"22261459689","Service Charge":8}',
+      referenceId: '1685981046915393087774',
+      requestId: '7775',
+      reversed: 'No',
+      status: 'Success',
+      walletDescription: 'Fund Transfer to 3057071087',
+    },
+  ];
 
   return (
-    <StyledTableContainer item xs={12} sm={12} md={12} component={Paper}>
-      <table ref={tableRef} className="display">
-        <thead>
-          <tr>
-            <th>Reference ID</th>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Transaction</th>
-            <th>Amount</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dummyData.map((row) => (
-            <tr key={row.id}>
-              <td>{row.id}</td>
-              <td>{row.name}</td>
-              <td>{row.type}</td>
-              <td>{row.transaction}</td>
-              <td>{row.amount}</td>
-              <td>{row.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </StyledTableContainer>
+    <>
+      
+      <DataTable columns={columns} data={data} />
+    </>
   );
-};
-
-export default TransactionsTable;
+}

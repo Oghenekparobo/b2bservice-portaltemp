@@ -53,7 +53,7 @@ const MerchantTable = () => {
   const fetchMerchants = async (page) => {
     setLoading(true);
     const { data } = await customFetch.get(`/fetch-merchants?page=${page}&perPage=${perPage}`);
-    console.log('data', data);
+
     setMerchantsData(data.message.merchants);
     setTotalRows(data.totalCount);
     setLoading(false);
@@ -76,8 +76,6 @@ const MerchantTable = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log(merchantsData);
-
   const handleSearch = async () => {
     if (searchValue !== '') {
       try {
@@ -93,7 +91,7 @@ const MerchantTable = () => {
           }
         );
         setMerchantsData([data?.data?.message]);
-        console.log(data);
+
         setLoading(false);
       } catch (error) {
         setLoading(false);

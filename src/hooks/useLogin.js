@@ -12,8 +12,6 @@ export const useLogin = () => {
 
   const handleLogin = async (adminType, username, inputUsername, inputPassword) => {
     if (adminType === 'super-admin') {
-      console.log('this is the super admin access');
-
       try {
         const body = {
           username: inputUsername,
@@ -34,8 +32,6 @@ export const useLogin = () => {
         setMessage('username or password is incorrect');
       }
     } else {
-      console.log('this is the merchant access');
-
       try {
         const body = {
           username: inputUsername,
@@ -50,7 +46,6 @@ export const useLogin = () => {
         localStorage.setItem('timestamp', timestamp.toString());
 
         if (data.token) {
-          console.log(data.token);
           navigate('/dashboard', { replace: true });
         }
       } catch (error) {

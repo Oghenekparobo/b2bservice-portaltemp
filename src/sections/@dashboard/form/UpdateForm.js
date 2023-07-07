@@ -17,7 +17,11 @@ export default function UpdateForm() {
   const [newCompanyName, setNewCompanyName] = useState('');
   const [newUsername, setNewUsername] = useState('');
   const [newPassword, setNewPassword] = useState('');
-
+  const [airtimeID, setAirtimeID] = useState('');
+  const [dataID, setDataID] = useState('');
+  const [b2bID, setB2bID] = useState('');
+  const [transactionID, setTransactionID] = useState('');
+  const [transactionPassword, setTransactionPassword] = useState('');
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState('');
 
@@ -67,7 +71,7 @@ export default function UpdateForm() {
         <TextField
           name="newUsername"
           type="email"
-          label="New Username"
+          label="New E-mail"
           value={newUsername}
           onChange={(e) => setNewUsername(e.target.value)}
           onBlur={() => setMessage('')}
@@ -89,6 +93,30 @@ export default function UpdateForm() {
               </InputAdornment>
             ),
           }}
+        />
+
+        <TextField
+          name="airtimeID"
+          label="AirtimeID"
+          value={airtimeID}
+          onChange={(e) => setAirtimeID(e.target.value)}
+        />
+        <TextField name="dataID" label="DataID" value={dataID} onChange={(e) => setDataID(e.target.value)} />
+
+        <TextField name="b2bID" label="B2bID" value={b2bID} onChange={(e) => setB2bID(e.target.value)} />
+
+        <TextField
+          name="transactionID"
+          label="TransactionID"
+          value={transactionID}
+          onChange={(e) => setTransactionID(e.target.value)}
+        />
+
+        <TextField
+          name="transactionPassword"
+          label="Transaction-Password"
+          value={transactionPassword}
+          onChange={(e) => setTransactionPassword(e.target.value)}
         />
       </Stack>
 

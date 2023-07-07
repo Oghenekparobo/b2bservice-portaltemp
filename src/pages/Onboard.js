@@ -25,7 +25,7 @@ export default function Onboard() {
 
       <Container>
         <Typography variant="h4" sx={{ mb: 5 }}>
-          {user === 'merchant' ? 'Create a Sub Merchant ' : ' Create New Merchants'}
+          {user === 'merchant' ? 'Create a user' : ' Create New Merchants'}
         </Typography>
 
         <Card>

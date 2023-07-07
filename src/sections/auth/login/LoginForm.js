@@ -44,7 +44,7 @@ export default function LoginForm({ adminType }) {
 
         <TextField
           name="name"
-          label="Username"
+          label="E-mail"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           onBlur={() => setMessage('')}

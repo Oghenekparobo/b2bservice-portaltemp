@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Grid, Container, Typography, Card, Button } from '@mui/material';
 import { useEffect } from 'react';
 import { useBalances } from '../hooks/useBalances';
-import { AppWidgetSummary, MerchantTable } from '../sections/@dashboard/app';
+import { AppWidgetSummary, MerchantTable, TransactionsTable } from '../sections/@dashboard/app';
 import Iconify from '../components/iconify';
 import customFetch from '../utils/http';
 import { CheckAuthorization } from '../utils/checkAuth';
@@ -77,7 +77,7 @@ export default function DashboardAppPage() {
         <Grid item xs={12} sm={6} md={3} sx={{ textAlign: 'right', marginTop: '2rem', marginBottom: '2rem' }}>
           {user === 'merchant' ? (
             <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 'bold', padding: '16px' }}>
-              {/* Transactions */}
+              Transaction History
             </Typography>
           ) : (
             <Link to="/dashboard/onboard">
@@ -100,6 +100,7 @@ export default function DashboardAppPage() {
         <Card sx={{ padding: '1rem' }}>
           {user === 'merchant' ? (
             <>
+              {/* <TransactionsTable /> */}
               <Grid container spacing={1} justifyContent="space-between">
                 <Grid item xs={12} sm={6} md={3} sx={{ textAlign: 'left', marginTop: '2rem', marginBottom: '2rem' }}>
                   {user === 'merchant' && (

@@ -121,10 +121,9 @@ export const sendRequest = async (user, body) => {
       if (data) {
         toast.success('Merchant Created Successfully', {
           position: 'top-center',
-          autoClose: 500,
+          autoClose: 200,
           hideProgressBar: false,
           closeOnClick: true,
-          draggable: true,
           theme: 'light',
         });
       }
@@ -138,12 +137,9 @@ export const sendRequest = async (user, body) => {
       if (data) {
         toast.success('Merchant Created Successfully', {
           position: 'top-center',
-          autoClose: 500,
+          autoClose: 200,
           hideProgressBar: false,
           closeOnClick: true,
-
-          draggable: true,
-          progress: undefined,
           theme: 'light',
         });
       }

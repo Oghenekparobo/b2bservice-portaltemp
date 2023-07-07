@@ -11,6 +11,11 @@ export default function Form() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [companyName, setCompanyName] = useState('');
+  const [airtimeID, setAirtimeID] = useState('');
+  const [dataID, setDataID] = useState('');
+  const [b2bID, setB2bID] = useState('');
+  const [transactionID, setTransactionID] = useState('');
+  const [transactionPassword, setTransactionPassword] = useState('');
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,7 +26,7 @@ export default function Form() {
     e.preventDefault();
 
     if (!/\S+@\S+\.\S+/.test(username)) {
-      setMessage('Username must be an E-mail address');
+      setMessage('Please enter a valid E-mail address');
       return;
     }
 
@@ -34,6 +39,11 @@ export default function Form() {
       name: companyName,
       username,
       password,
+      airtimeID,
+      dataID,
+      b2bID,
+      transactionID,
+      transactionPassword,
     };
 
     setLoading(true);
@@ -60,7 +70,7 @@ export default function Form() {
         <TextField
           name="username"
           type="email"
-          label="Username"
+          label="E-mail"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           onBlur={() => setMessage('')}
@@ -83,6 +93,29 @@ export default function Form() {
             ),
           }}
         />
+        <TextField
+          name="airtimeID"
+          label="AirtimeID"
+          value={airtimeID}
+          onChange={(e) => setAirtimeID(e.target.value)}
+        />
+        <TextField name="dataID" label="DataID" value={dataID} onChange={(e) => setDataID(e.target.value)} />
+
+        <TextField name="b2bID" label="B2bID" value={b2bID} onChange={(e) => setB2bID(e.target.value)} />
+
+        <TextField
+          name="transactionID"
+          label="TransactionID"
+          value={transactionID}
+          onChange={(e) => setTransactionID(e.target.value)}
+        />
+
+        <TextField
+          name="transactionPassword"
+          label="Transaction-Password"
+          value={transactionPassword}
+          onChange={(e) => setTransactionPassword(e.target.value)}
+        />
       </Stack>
 
       {user === 'super-admin' && (
@@ -93,10 +126,9 @@ export default function Form() {
 
       {user === 'merchant' && (
         <LoadingButton fullWidth size="large" type="submit" variant="contained" onClick={handleClick}>
-          Onboard
+          {loading ? 'Onboarding...' : ' Onboard'}
         </LoadingButton>
       )}
-
       {/* {user === 'merchant' && createdSubmerchants.length >= 2 && (
         <div>You have reached the maximum number of submerchants</div>
       )} */}

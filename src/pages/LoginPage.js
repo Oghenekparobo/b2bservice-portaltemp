@@ -45,8 +45,6 @@ export default function LoginPage() {
   // log "user-type"
   const adminType = pathname.split('/')[1];
 
-  console.log(adminType);
-
   const mdUp = useResponsive('up', 'md');
   const remValue = 2;
   const fontSize = 16;
